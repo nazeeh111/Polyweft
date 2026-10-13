@@ -42,9 +42,45 @@ def main():
             shutil.copyfile(args.example / name, root / name)
         for directory in ["textures", "merged", "demo"]:
             shutil.copytree(args.example / directory, root / directory)
+        # Include license and complete corresponding original software source.
+        project = Path(__file__).resolve().parents[1]
+        shutil.copyfile(project / "LICENSE", root / "LICENSE")
+        source_root = root / "source"
+        source_root.mkdir()
+        for name in [
+            "README.md",
+            "LICENSE",
+            "pyproject.toml",
+            "MANIFEST.in",
+            "CONTRIBUTING.md",
+            "SECURITY.md",
+        ]:
+            shutil.copyfile(project / name, source_root / name)
+        for directory in ["src", "tools", "tests", "docs", "examples"]:
+            for path in sorted((project / directory).rglob("*")):
+                if (
+                    not path.is_file()
+                    or path.is_symlink()
+                    or "__pycache__" in path.parts
+                ):
+                    continue
+                if path.suffix not in {
+                    ".py",
+                    ".mjs",
+                    ".html",
+                    ".css",
+                    ".svg",
+                    ".md",
+                    ".png",
+                }:
+                    continue
+                target = source_root / path.relative_to(project)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(path, target)
         (root / "README.md").write_text(
             "# Polyweft Tide native example\n\n"
             "Original generated ribbon sculpture, with two objects sharing a mesh and independent UV seam edits.\n"
+            "Original software source is in source/ and licensed GPL-3.0-or-later (LICENSE).\n"
             "Generated and reopened using Blender "
             + args.runtime
             + ". Artwork and generator are original Polyweft work.\n\n"
