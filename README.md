@@ -8,7 +8,9 @@ Polyweft reviews a common ancestor and two native `.blend` branches, combines in
 
 [Open the review studio](https://nazeeh111.github.io/Polyweft/) · [Get the release](https://github.com/nazeeh111/Polyweft/releases) · [Read the merge contract](docs/CONTRACT.md)
 
-<!-- Verified studio and native render images are added after their gates pass. -->
+![Actual merged Tide scene rendered with Blender](docs/tide-native.png)
+
+*An actual native merged scene, rendered locally with Blender. [Review it interactively](https://nazeeh111.github.io/Polyweft/) or [see the installed studio](docs/studio-mobile.png).*
 
 ## What you can do
 
@@ -18,7 +20,7 @@ The review displays actual captured geometry, UV corners and numerical values. I
 
 ## Run it
 
-Python 3.11+ and a local Blender executable are required. No account, AI API, cloud service or Python runtime dependency is required. Install the release wheel or source:
+Python 3.11+ and a local Blender executable are required. Official Blender 4.5.14 LTS is tested on Linux in CI; a local Blender 5.3 Alpha build is also tested. Other runtime/platform combinations are not yet verified. No account, AI API, cloud service or Python runtime dependency is required. Install the release wheel or source:
 
 ```sh
 python -m pip install .
@@ -44,6 +46,8 @@ polyweft apply review --decisions decisions.json --output merged.blend \
   --accept-payload-scope --blender /path/to/blender
 ```
 
+Download the **Blender 4.5 native Tide example** from the release assets, extract it, and run `polyweft plan` on its three branch files to create a local review. The public demo replaces machine paths with labels; it is for review, not direct native apply.
+
 No conflicts? Omit `--decisions`. The output must be new. The command refuses unresolved conflicts, changed source bytes, manipulated plans, unsupported structure and existing output paths. Review directories can contain local paths and labels; inspect them before sharing.
 
 ## Scope
@@ -65,6 +69,12 @@ Blender files are native binary projects. Auto-execution is disabled during load
 Whole-file version control cannot keep two independent edits inside one shared binary mesh by choosing only one file. Blender link/append is useful for separate assets, but does not reconcile those edits. Polyweft owns a deliberately narrower native write-back workflow.
 
 Mesh merging has substantial prior art. [MeshGit](https://gfx.cse.taylor.edu/projects/meshgit/meshgit-s13.pdf) is earlier research with more general topology correspondence. [BlenDiff](https://github.com/Vishrut2403/blendiff) compares a broader scene and documents mesh geometry as a manual write-back domain. Polyweft does not claim to invent mesh merging or replace either project's full scope. Its implementation and generated example are original; no third-party project code or evidence was copied.
+
+## Verification
+
+The release gates execute 15 Python checks, including native Blender save/reopen and loopback HTTP boundaries, plus five Node preview/decision checks. Independent review reproduced and fixed shader mute, UV-render selector and concave-face preview defects. It also checked published-file textures, shared mesh aliases, destination metadata and input bytes. The browser export has been applied through the installed CLI outside the source checkout.
+
+See [the detailed evidence and limits](docs/VERIFICATION.md). Native verification establishes the declared supported payload, not artistic quality or geometric validity.
 
 ## Develop
 

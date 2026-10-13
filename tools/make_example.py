@@ -64,12 +64,12 @@ def inside_blender(stage, folder):
             u = 2 * math.pi * i / n
             for j in range(m):
                 v = (j / (m - 1) - 0.5) * 0.56
-                radius = 1.12 + v * math.cos(1.5 * u)
+                radius = 1.12 + v * math.cos(u)
                 coords.append(
                     (
                         radius * math.cos(u),
                         radius * math.sin(u),
-                        0.32 * math.sin(2 * u) + v * math.sin(1.5 * u),
+                        0.32 * math.sin(2 * u) + v * math.sin(u),
                     )
                 )
         faces = [
