@@ -1,0 +1,51 @@
+name: Verify
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.14']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install package
+        run: python -m pip install .
+      - name: Fetch official Blender 4.5 LTS
+        run: |
+          curl --fail --retry 2 -O https://download.blender.org/release/Blender4.5/blender-4.5.14-linux-x64.tar.xz
+          curl --fail --retry 2 -O https://download.blender.org/release/Blender4.5/blender-4.5.14.sha256
+          grep 'blender-4.5.14-linux-x64.tar.xz$' blender-4.5.14.sha256 > selected.sha256
+          sha256sum --check selected.sha256
+          tar -xf blender-4.5.14-linux-x64.tar.xz
+          echo "POLYWEFT_BLENDER=$PWD/blender-4.5.14-linux-x64/blender" >> "$GITHUB_ENV"
+      - name: Core and real native Blender tests (no skipped native gate)
+        run: python -m unittest discover -s tests -v
+      - name: Browser preview and decision controls
+        run: node --test tests/*.test.mjs
+      - name: Installed console script
+        working-directory: /tmp
+        run: polyweft --help
+      - name: Generate stable native example and portable review
+        if: matrix.python == '3.11'
+        run: |
+          "$POLYWEFT_BLENDER" --version
+          python tools/make_example.py --blender "$POLYWEFT_BLENDER" --output native-example
+          python tools/build_demo.py native-example/review native-example/demo
+          python tools/package_example.py native-example native-evidence/Polyweft-Tide-Blender45.zip --runtime 4.5.14
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: matrix.python == '3.11'
+        with:
+          name: native-Blender45-example
+          path: native-evidence/Polyweft-Tide-Blender45.zip
+          retention-days: 14
+          if-no-files-found: error

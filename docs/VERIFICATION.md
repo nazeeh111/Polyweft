@@ -1,0 +1,15 @@
+# Verification and limits
+
+The release gate uses real Blender files and actual processes. No browser animation substitutes for native merging.
+
+- **Local installed wheel:** all 12 package/resource files matched source bytes. Fifteen Python tests executed with the pinned Blender 5.3 Alpha build, including six native integration cases and three actual HTTP boundary cases. Five Node checks passed.
+- **Official stable runtime:** Linux CI downloaded official Blender 4.5.14 LTS, checked the vendor SHA256 and executed all 15 Python and five Node checks under Python 3.11 and 3.14. The Python 3.11 job generated a new native example and portable source-bearing ZIP. Native tests did not skip.
+- **Independent review:** the reviewer used separate actual native branch fixtures, reproduced shader mute and active-UV-map admission gaps, verified refusal after fixes, and tested 132 concave/collinear display cases. Plain Blender reopened the final published output and separately prepared file without the merge bridge's path normalization. Texture references resolved to original bytes, shared users and destination metadata survived, and input hashes stayed unchanged.
+- **Real studio workflow:** actual browser controls selected left material roughness, right UV and ancestor XYZ. Exported JSON was re-bound through a freshly captured local plan and applied by the installed package from outside the repository. The new native output passed fresh reopen checks. A portable public plan with redacted file paths requires local capture before native apply.
+- **Original scene:** Tide uses 256 vertices, 224 quad faces and two objects sharing the mesh. It has 40 supported edits and three conflicts across vertex, UV and material domains. The ribbon parameterization is periodic across the wrap. A real Cycles CPU render was visually inspected; its producer is `tools/render_example.py`.
+
+Existing native source/output aliases, no scope acknowledgement, unresolved/unknown/stale choices, manipulated/rehashed changes, missing identities and unsupported target structure refuse without a native output. Shape keys and linked target data are refused. UV render/clone selection, supported node semantics and other guarded target attributes cannot be silently merged.
+
+The target admission limits are 20,000 vertices, 20,000 faces, 80,000 corners (including all UV layers), eight material slots and 32 nodes per target material. These are resource bounds, not promises of performance on every scene. The studio uses a bounded dominant-axis triangulation for concave display; degenerate or overly complex faces are visibly omitted. Nonplanar display and Blender's exact native tessellation can differ.
+
+This does not establish arbitrary unprepared-scene correspondence, topology-changing merge, full-scene difference coverage, artistic quality, geometric validity or Blender parser security. All fields outside the admitted payload come from the right scene. Windows and official macOS stable Blender combinations remain untested. External asset path preservation is checked; arbitrary external-file content/version changes are not inferred as merge edits.
