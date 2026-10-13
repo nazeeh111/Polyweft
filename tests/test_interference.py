@@ -152,6 +152,40 @@ class InterferenceTests(unittest.TestCase):
                     classify_pair(a, exact(b), [1, 2, 3], ids)["kind"], kind
                 )
 
+    def test_shared_diagonals_require_boundary_edges_in_both_parent_polygons(self):
+        from fractions import Fraction as F
+
+        exact = lambda rows: [tuple(F(v) for v in row) for row in rows]
+        a = exact([(-1, 0, 0), (0, 1, 0), (1, 0, 0)])
+        b = exact([(-1, 0, 0), (0, 0, 1), (1, 0, 0)])
+        edges_a = {frozenset(edge) for edge in [(1, 2), (2, 3), (3, 4), (4, 1)]}
+        edges_b = {frozenset(edge) for edge in [(1, 5), (5, 3), (3, 6), (6, 1)]}
+        for left_edges, right_edges in [
+            (edges_a, edges_b),
+            (edges_a, {frozenset((1, 3))}),
+            ({frozenset((1, 3))}, edges_b),
+        ]:
+            with self.subTest(edges=(left_edges, right_edges)):
+                result = classify_pair(
+                    a, b, [1, 2, 3], [1, 5, 3], left_edges, right_edges
+                )
+                self.assertEqual(result["kind"], "contact")
+                self.assertEqual(result["points"], [["-1", "0", "0"], ["1", "0", "0"]])
+        self.assertEqual(
+            classify_pair(
+                a, b, [1, 2, 3], [1, 5, 3], {frozenset((1, 3))}, {frozenset((1, 3))}
+            )["kind"],
+            "adjacent-boundary",
+        )
+
+    def test_shared_vertex_does_not_suppress_intersection_away_from_vertex(self):
+        from fractions import Fraction as F
+
+        exact = lambda rows: [tuple(F(v) for v in row) for row in rows]
+        a = exact([(0, 0, 0), (2, 0, 0), (0, 2, 0)])
+        b = exact([(0, 0, 0), (1, 1, -1), (1, 1, 1)])
+        self.assertEqual(classify_pair(a, b, [1, 2, 3], [1, 4, 5])["kind"], "crossing")
+
     def test_prior_interference_not_blame_merge(self):
         b, _l, _r = fixture()
         for v in b["vertices"][:8]:

@@ -90,6 +90,53 @@ class NativeInterferenceTests(unittest.TestCase):
         self.assertFalse(target.exists())
         self.assert_unchanged()
 
+    def test_native_shared_diagonals_are_contact_not_boundary(self):
+        raw = self.folder / "diagonal-raw.blend"
+        script = self.folder / "make-diagonals.py"
+        script.write_text(
+            "import bpy\nbpy.ops.object.select_all(action='SELECT')\nbpy.ops.object.delete(use_global=False)\nm=bpy.data.meshes.new('Crossing diamonds')\nm.from_pydata([(-1,0,0),(0,1,0),(1,0,0),(0,-1,0),(0,0,1),(0,0,-1)],[],[(0,1,2,3),(0,4,2,5)])\nm.update()\no=bpy.data.objects.new('Crossing diamonds',m)\nbpy.context.collection.objects.link(o)\nbpy.context.view_layer.objects.active=o\no.select_set(True)\nbpy.ops.wm.save_as_mainfile(filepath="
+            + repr(str(raw))
+            + ",check_existing=False)\n"
+        )
+        result = subprocess.run(
+            [
+                self.blender,
+                "--background",
+                "--factory-startup",
+                "--disable-autoexec",
+                "--offline-mode",
+                "--python-exit-code",
+                "1",
+                "--python",
+                str(script),
+            ],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=90,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout[-2000:])
+        prepared = self.folder / "diagonal-base.blend"
+        prepare_source(raw, "Crossing diamonds", prepared, self.blender)
+        original = source_info(prepared)
+        review = self.folder / "diagonal-review"
+        create_plan(prepared, prepared, prepared, review, self.blender)
+        report = inspect_plan(
+            review, self.folder / "diagonal-inspection", None, self.blender
+        )
+        self.assertTrue(report["complete"])
+        for state in ["base", "left", "right", "merged"]:
+            triangles = report["geometry"][state]["triangles"]
+            self.assertEqual(len(triangles), 4)
+            self.assertTrue(
+                all({1, 3} <= set(t["vertices"]) for t in triangles),
+                "This native regression requires the shared IDs to be actual tessellation diagonals",
+            )
+            self.assertEqual(report["summaries"][state]["contacts"], 1)
+            self.assertEqual(report["summaries"][state]["crossings"], 0)
+        self.assertEqual(source_info(prepared), original)
+        self.assert_unchanged()
+
     def test_actual_quad_nonplanar_and_concave_native_tessellation(self):
         self.generator.stage("polygons", self.folder, self.blender)
         prepared = self.folder / "polygon-base.blend"

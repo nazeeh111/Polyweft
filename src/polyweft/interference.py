@@ -176,6 +176,10 @@ def _prepare_geometry(plan, decisions, geometry, limits):
             "triangles": triangles,
             "unknown": unknown,
             "bounds": bounds,
+            "boundary_edges": {
+                face: _boundary_edges(vertices)
+                for face, vertices in enumerate(g["faces"])
+            },
         }
     return prepared
 
@@ -295,7 +299,12 @@ def inspect_surfaces(plan, decisions, geometry, runtime, limits=None):
             work["exact_tests"] += 1
             ta, tb = geometry[state]["triangles"][a], geometry[state]["triangles"][b]
             result = classify_pair(
-                p["triangles"][a], p["triangles"][b], ta["vertices"], tb["vertices"]
+                p["triangles"][a],
+                p["triangles"][b],
+                ta["vertices"],
+                tb["vertices"],
+                p["boundary_edges"][ta["face"]],
+                p["boundary_edges"][tb["face"]],
             )
             if result["kind"] == "unknown":
                 uncertain = True
@@ -548,7 +557,16 @@ def coplanar_polygon(a, b):
     return points, area2 > 0
 
 
-def classify_pair(a, b, ids_a, ids_b):
+def _boundary_edges(vertices):
+    return {frozenset((a, b)) for a, b in zip(vertices, vertices[1:] + vertices[:1])}
+
+
+def classify_pair(a, b, ids_a, ids_b, boundary_edges_a=None, boundary_edges_b=None):
+    """Suppress only joins on actual shared parent boundaries, not tessellation diagonals.
+
+    Standalone triangles default to their three boundary edges. Native inspection
+    supplies both original polygon boundaries independently of their triangulation.
+    """
     if normal(a) == (0, 0, 0) or normal(b) == (0, 0, 0):
         return {"kind": "unknown", "reason": "degenerate triangle"}
     # Broad phase uses closed bounds so exact contacts are not discarded.
@@ -573,7 +591,15 @@ def classify_pair(a, b, ids_a, ids_b):
     expected = [p for vid, p in zip(ids_a, a) if vid in common]
     if len(common) == 1 and all(p == expected[0] for p in points):
         return {"kind": "adjacent-boundary"}
-    if len(common) == 2 and all(point_on_segment(p, *expected) for p in points):
+    shared_edge = frozenset(common)
+    edges_a = _boundary_edges(ids_a) if boundary_edges_a is None else boundary_edges_a
+    edges_b = _boundary_edges(ids_b) if boundary_edges_b is None else boundary_edges_b
+    if (
+        len(common) == 2
+        and shared_edge in edges_a
+        and shared_edge in edges_b
+        and all(point_on_segment(p, *expected) for p in points)
+    ):
         return {"kind": "adjacent-boundary"}
     if positive_area:
         kind = "coplanar-overlap"
