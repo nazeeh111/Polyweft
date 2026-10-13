@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "polyweft"
+version = "0.1.0"
+description = "Review and combine native Blender vertex, UV and material edits without replacing the destination scene"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [{name = "Nazeeh"}]
+dependencies = []
+keywords = ["blender", "mesh", "three-way-merge", "uv", "collaboration"]
+classifiers = ["Programming Language :: Python :: 3", "Topic :: Multimedia :: Graphics :: 3D Modeling", "Operating System :: OS Independent"]
+
+[project.urls]
+Repository = "https://github.com/nazeeh111/Polyweft"
+Issues = "https://github.com/nazeeh111/Polyweft/issues"
+Demo = "https://nazeeh111.github.io/Polyweft/"
+
+[project.scripts]
+polyweft = "polyweft.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+polyweft = ["studio/*"]
