@@ -72,6 +72,7 @@ def main():
                     ".svg",
                     ".md",
                     ".png",
+                    ".json",
                 }:
                     continue
                 target = source_root / path.relative_to(project)

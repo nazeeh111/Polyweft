@@ -21,6 +21,14 @@ from .core import (
 
 MAX_BLEND = 512 * 1024 * 1024
 TIMEOUT = 90
+STUDIO_FILES = (
+    "index.html",
+    "app.mjs",
+    "style.css",
+    "geometry.mjs",
+    "inspection.mjs",
+    "mark.svg",
+)
 
 
 def source_info(path):
@@ -225,13 +233,7 @@ def create_plan(base, left, right, output, blender):
         assets = studio_root()
         if not assets.is_dir():
             raise ValueError("Installed studio assets are missing")
-        for filename in [
-            "index.html",
-            "app.mjs",
-            "style.css",
-            "geometry.mjs",
-            "mark.svg",
-        ]:
+        for filename in STUDIO_FILES:
             src = assets / filename
             if not src.is_file() or src.is_symlink():
                 raise ValueError(
@@ -242,14 +244,7 @@ def create_plan(base, left, right, output, blender):
         destination.mkdir()
         created = []
         try:
-            for filename in [
-                "index.html",
-                "app.mjs",
-                "style.css",
-                "geometry.mjs",
-                "mark.svg",
-                "plan.json",
-            ]:
+            for filename in (*STUDIO_FILES, "plan.json"):
                 target = destination / filename
                 os.link(bundle / filename, target)
                 created.append(target)
@@ -262,6 +257,102 @@ def create_plan(base, left, right, output, blender):
                 pass
             raise
     return plan
+
+
+def inspect_plan(review, output, decisions, blender):
+    """Fresh native, no-save four-state surface inspection into a new bundle."""
+    from .interference import inspect_surfaces
+
+    review = Path(review).resolve(strict=True)
+    if not review.is_dir() or (review / "plan.json").is_symlink():
+        raise ValueError("Review must contain a regular plan.json")
+    plan = verify_plan(strict_load((review / "plan.json").read_bytes()))
+    supplied = None if decisions is None else strict_load(Path(decisions).read_bytes())
+    values = resolve_decisions(plan, supplied)
+    _check_sources(plan["sources"])
+    destination = new_output(output)
+    mesh_id = plan["snapshots"]["base"]["guards"]["mesh_id"]
+    with tempfile.TemporaryDirectory(
+        prefix=".polyweft-inspect-", dir=destination.parent
+    ) as temporary:
+        temporary = Path(temporary)
+        captures = {}
+        geometry = {}
+        runtime = None
+        for state in ("base", "left", "right", "merged"):
+            source = plan["sources"]["right" if state == "merged" else state]["path"]
+            request = {
+                "mode": "surface",
+                "source": source,
+                "mesh_id": mesh_id,
+                "reference_directory": str(Path(source).parent),
+            }
+            if state == "merged":
+                request["values"] = values
+            surface = bridge(blender, request, temporary / state)
+            if type(surface) is not dict or set(surface) != {
+                "before",
+                "after",
+                "geometry",
+                "runtime",
+            }:
+                raise ValueError("Unexpected native surface response")
+            expected = plan["snapshots"]["right" if state == "merged" else state]
+            if canonical(surface["before"]) != canonical(expected):
+                raise ValueError("Plan no longer matches fresh native source capture")
+            if runtime is None:
+                runtime = surface["runtime"]
+            elif canonical(runtime) != canonical(surface["runtime"]):
+                raise ValueError(
+                    "Native runtime identity changed between surface states"
+                )
+            if state == "merged":
+                after = surface["after"]
+                if (
+                    after["guards"] != expected["guards"]
+                    or after["observed"] != expected["observed"]
+                    or after["name"] != expected["name"]
+                    or {k: v["value"] for k, v in flatten(after).items()} != values
+                ):
+                    raise ValueError(
+                        "In-memory combined surface disagrees with validated whole merge values"
+                    )
+            elif canonical(surface["after"]) != canonical(expected):
+                raise ValueError("No-save source capture changed its supported payload")
+            captures[state] = surface["before"]
+            geometry[state] = surface["geometry"]
+        fresh = build_plan(
+            plan["sources"], *(captures[k] for k in ("base", "left", "right"))
+        )
+        if canonical(fresh) != canonical(plan):
+            raise ValueError("Plan no longer matches fresh native source derivation")
+        report = inspect_surfaces(plan, supplied, geometry, runtime)
+        _check_sources(plan["sources"])
+        bundle = temporary / "bundle"
+        bundle.mkdir()
+        for name, document in (("plan.json", plan), ("inspection.json", report)):
+            (bundle / name).write_bytes(canonical(document) + b"\n")
+        for filename in STUDIO_FILES:
+            source = studio_root() / filename
+            if not source.is_file() or source.is_symlink():
+                raise ValueError("Installed studio asset is missing: " + filename)
+            shutil.copyfile(source, bundle / filename)
+        destination.mkdir()
+        created = []
+        try:
+            for filename in (*STUDIO_FILES, "plan.json", "inspection.json"):
+                target = destination / filename
+                os.link(bundle / filename, target)
+                created.append(target)
+        except BaseException:
+            for target in created:
+                target.unlink()
+            try:
+                destination.rmdir()
+            except OSError:
+                pass
+            raise
+        return report
 
 
 def apply_plan(review, output, decisions, blender, accept_scope=False):

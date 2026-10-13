@@ -1,5 +1,7 @@
 # Merge contract
 
+Surface inspection is an optional, separately bound diagnosis. Its [four-state contract](INTERFERENCE.md) uses native triangles and retains incomplete/unknown cases. It preserves this merge admission and write-back contract; it does not automatically repair geometry or silently alter choices.
+
 The common ancestor carries an explicit target mesh identity, stable vertex and corner identities, shared-object identities and admitted material/node identities. The prepare command saves a new ancestor. Both branches must descend from that prepared file.
 
 Each supported field uses the same three-way rule:
