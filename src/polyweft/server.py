@@ -10,6 +10,8 @@ ALLOWED = {
     "/app.mjs": "app.mjs",
     "/style.css": "style.css",
     "/geometry.mjs": "geometry.mjs",
+    "/inspection.mjs": "inspection.mjs",
+    "/inspection.json": "inspection.json",
     "/plan.json": "plan.json",
     "/mark.svg": "mark.svg",
 }

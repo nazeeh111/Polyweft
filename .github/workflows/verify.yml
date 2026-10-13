@@ -42,10 +42,13 @@ jobs:
           python tools/make_example.py --blender "$POLYWEFT_BLENDER" --output native-example
           python tools/build_demo.py native-example/review native-example/demo
           python tools/package_example.py native-example native-evidence/Polyweft-Tide-Blender45.zip --runtime 4.5.14
+          python tools/make_interference_example.py --blender "$POLYWEFT_BLENDER" --output native-interference
+          python tools/build_demo.py native-interference/inspection native-interference/demo
+          python tools/package_interference_example.py native-interference native-evidence/Polyweft-Flanges-Blender45.zip
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: matrix.python == '3.11'
         with:
           name: native-Blender45-example
-          path: native-evidence/Polyweft-Tide-Blender45.zip
+          path: native-evidence/*.zip
           retention-days: 14
           if-no-files-found: error

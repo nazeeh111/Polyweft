@@ -534,6 +534,31 @@ def rebase_external_paths(output):
         )
 
 
+def native_surface(obj, captured):
+    """Actual cached native tessellation, with stable parent/corner correspondence."""
+    mesh = obj.data
+    mesh.calc_loop_triangles()
+    vertices = mesh.attributes[VID].data
+    corners = mesh.attributes[CID].data
+    triangle_count = len(mesh.loop_triangles)
+    maximum = 80_000
+    triangles = [
+        {
+            "face": triangle.polygon_index,
+            "vertices": [vertices[v].value for v in triangle.vertices],
+            "corners": [corners[loop].value for loop in triangle.loops],
+        }
+        for triangle in mesh.loop_triangles[:maximum]
+    ]
+    return {
+        "vertices": captured["vertices"],
+        "faces": captured["faces"],
+        "triangles": triangles,
+        "complete": triangle_count <= maximum,
+        "triangle_count": triangle_count,
+    }
+
+
 def run(request):
     bpy.context.preferences.filepaths.save_version = 0
     source = request["source"]
@@ -565,6 +590,20 @@ def run(request):
     captured = snapshot(obj, reference)
     if mode in {"capture", "capture-base"}:
         return captured
+    if mode == "surface":
+        before = captured
+        if "values" in request:
+            apply_values(obj, request["values"])
+            captured = snapshot(obj, reference)
+        return {
+            "before": before,
+            "after": captured,
+            "geometry": native_surface(obj, captured),
+            "runtime": {
+                "version": bpy.app.version_string,
+                "build_hash": bpy.app.build_hash.decode("ascii", "replace"),
+            },
+        }
     if mode == "apply":
         apply_values(obj, request["values"])
         captured = snapshot(obj, reference)

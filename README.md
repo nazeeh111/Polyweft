@@ -8,6 +8,10 @@ Polyweft reviews a common ancestor and two native `.blend` branches, combines in
 
 [Open the review studio](https://nazeeh111.github.io/Polyweft/) · [Get the release](https://github.com/nazeeh111/Polyweft/releases) · [Read the merge contract](docs/CONTRACT.md)
 
+**A clean field merge can still make surfaces cross.** Two artists can change different vertices, with neither branch intersecting itself, yet combine their edits into crossing faces. Polyweft now compares the same face pair in the ancestor, both branches and the configured result using Blender's actual triangle surfaces. It retains exact intersection witnesses, the accepted edits on those faces and their source hashes.
+
+[Explore the interference case](https://nazeeh111.github.io/Polyweft/interference/) has 16 independent edits, zero competing values and 20 crossing face pairs after combination. Compare either complete branch alone, inspect the pair history and trace its accepted vertex values. This is a diagnosis of the represented target surface, with explicit incomplete results, rather than a whole-scene or physical-safety check.
+
 ![Actual merged Tide scene rendered with Blender](docs/tide-native.png)
 
 *An actual native merged scene, rendered locally with Blender. [Review it interactively](https://nazeeh111.github.io/Polyweft/) or [see the installed studio](docs/studio-mobile.png).*
@@ -25,6 +29,8 @@ Python 3.11+ and a local Blender executable are required. Official Blender 4.5.1
 ```sh
 python -m pip install .
 ```
+
+For an installation without a source checkout, download the wheel from the release and run `python -m pip install /path/to/polyweft-0.2.0-py3-none-any.whl`.
 
 Prepare a common ancestor **before** either artist branches:
 
@@ -47,6 +53,17 @@ polyweft apply review --decisions decisions.json --output merged.blend \
 ```
 
 Download the **Blender 4.5 native Tide example** from the release assets, extract it, and run `polyweft plan` on its three branch files to create a local review. The public demo replaces machine paths with labels; it is for review, not direct native apply.
+
+Inspect the configured combination before applying it:
+
+```sh
+polyweft inspect review --decisions decisions.json --output inspected --blender /path/to/blender
+polyweft studio inspected --port 6395
+```
+
+Omit `--decisions` for a conflict-free review. Inspection recaptures the exact source files and builds the combined surface in memory, without saving a source scene. The output is a new read-only review bundle with `inspection.json`. It uses Blender's actual triangles separately in every state, including changes in how a quad or concave face is split. Keep the original report file unchanged for its checksum. Its recorded choices load into the studio; changing a choice immediately makes the inspection stale. Export the new choices and rerun `inspect` to obtain new evidence.
+
+The original **Flanges** release bundle includes the three source files, a saved merged scene, fresh reopen evidence and complete corresponding software source. Its deliberate crossings demonstrate why independent field edits still need geometric review. The report records intersections; it does not edit the branch files. Revise an edit in Blender and capture a new plan when you want a different surface.
 
 No conflicts? Omit `--decisions`. The output must be new. The command refuses unresolved conflicts, changed source bytes, manipulated plans, unsupported structure and existing output paths. Review directories can contain local paths and labels; inspect them before sharing.
 
@@ -72,7 +89,7 @@ Mesh merging has substantial prior art. [MeshGit](https://gfx.cse.taylor.edu/pro
 
 ## Verification
 
-The release gates execute 15 Python checks, including native Blender save/reopen and loopback HTTP boundaries, plus five Node preview/decision checks. Independent review reproduced and fixed shader mute, UV-render selector and concave-face preview defects. It also checked published-file textures, shared mesh aliases, destination metadata and input bytes. The browser export has been applied through the installed CLI outside the source checkout.
+The release workflow runs 29 Python checks, including real native Blender save/reopen, four-state surface capture and loopback HTTP boundaries, plus 13 Node preview/decision/inspection checks. Independent review compared 492 triangle pairs with a separate exact intersection test, checked native quad/ngon tessellation and repaired a display-coverage gap. Captured report bytes and complete/incomplete metadata are checked before browser display. The original merge review also checked published-file textures, shared mesh aliases, destination metadata and input bytes.
 
 See [the detailed evidence and limits](docs/VERIFICATION.md). Native verification establishes the declared supported payload, not artistic quality or geometric validity.
 

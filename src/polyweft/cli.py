@@ -8,7 +8,7 @@ from pathlib import Path
 
 from . import __version__
 from .core import SCOPE
-from .native import apply_plan, create_plan, prepare_source
+from .native import apply_plan, create_plan, inspect_plan, prepare_source
 from .server import serve
 
 
@@ -32,6 +32,13 @@ def main(argv=None):
     studio = sub.add_parser("studio")
     studio.add_argument("review")
     studio.add_argument("--port", type=int, default=0)
+    inspection = sub.add_parser(
+        "inspect", help="Compare native surface interference across four merge states"
+    )
+    inspection.add_argument("review")
+    inspection.add_argument("--decisions")
+    inspection.add_argument("--output", required=True)
+    inspection.add_argument("--blender", required=True)
     apply = sub.add_parser("apply")
     apply.add_argument("review")
     apply.add_argument("--output", required=True)
@@ -60,6 +67,10 @@ def main(argv=None):
                 raise ValueError("Port must be 0..65535")
             serve(args.review, args.port)
             return 0
+        elif args.command == "inspect":
+            result = inspect_plan(
+                args.review, args.output, args.decisions, args.blender
+            )
         else:
             result = apply_plan(
                 args.review,
