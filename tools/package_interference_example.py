@@ -87,6 +87,8 @@ def main():
                     ".svg",
                     ".md",
                     ".png",
+                    ".jpg",
+                    ".gif",
                     ".json",
                     ".yml",
                 }:

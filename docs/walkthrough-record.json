@@ -1,0 +1,50 @@
+{
+  "interference-walkthrough.gif": {
+    "captures": [
+      "01-combined.jpg",
+      "02-left-alone.jpg",
+      "03-right-alone.jpg",
+      "04-combined-witness.jpg"
+    ],
+    "duration_ms": [
+      4000,
+      4000,
+      4000,
+      6000
+    ],
+    "size": [
+      1470,
+      745
+    ],
+    "capture_sha256": {
+      "01-combined.jpg": "834f9ba9f32afef00e20d280b5c635b6fe6cd3656fed0292d470bef6964f791b",
+      "02-left-alone.jpg": "3af5d926bdaa9df13121e07bc132b6f8922c1fd5fcec21767b19e95ad7604801",
+      "03-right-alone.jpg": "f5911e32a9fd363d01b3bad4f8b544106124f499c63a5bb8a4fdc9bfd3aabc6f",
+      "04-combined-witness.jpg": "c3b73db6e8640c3be95f3843c5a66abf130b5fe5ce35d32185f4acb0ad6517f5"
+    }
+  },
+  "interference-mobile.gif": {
+    "captures": [
+      "12-mobile-ancestor.jpg",
+      "13-mobile-left.jpg",
+      "14-mobile-right.jpg",
+      "15-mobile-combined-restored.jpg"
+    ],
+    "duration_ms": [
+      4000,
+      4000,
+      4000,
+      6000
+    ],
+    "size": [
+      390,
+      844
+    ],
+    "capture_sha256": {
+      "12-mobile-ancestor.jpg": "c067c6efeff6699ded95a77f7965bd5e4407d5286cdf2fc78e0f6f453af79142",
+      "13-mobile-left.jpg": "fe75a20c42212293f283da6d20f1d04c24be9bcd54f0d157f4c771cc4411a9c1",
+      "14-mobile-right.jpg": "617ff899fad197a72d2a7dd57d7feeaec6d2099c566b8543a77ab4fa0093568b",
+      "15-mobile-combined-restored.jpg": "139210048e00d1b9a8365f3d2f2e514db465689892b39fcb976da2aaa8cb5a2d"
+    }
+  }
+}
