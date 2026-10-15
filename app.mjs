@@ -2,7 +2,7 @@
 import {validatePlan,previewVertices,decisionDocument,meshFrame,projectMesh} from './geometry.mjs';
 import {parseInspectionText,validateInspection,inspectionMatches,inspectionStatus} from './inspection.mjs';
 const $=s=>document.querySelector(s), sides=['base','left','right','result'];
-const colors={base:'#89948b',left:'#ef8b75',right:'#72cbc3',same:'#cad67c',conflict:'#f0c24f'};
+const colors={base:'#929aa5',left:'#ff8976',right:'#55d6e8',same:'#c7ced9',conflict:'#f9d464'};
 let plan=null,choices={},filter='all',selected=null,yaw=-.58,pitch=.46,zoom=1,wire=false,visibleLimit=100,frame=null;
 let inspection=null,selectedPair=0,geometryVariant='merged',choiceRevision=0;
 const notice=message=>{const el=$('#notice');el.textContent=message;el.hidden=!message;};
@@ -21,6 +21,7 @@ function setPlan(p){
   }
   const select=$('#uv-layer');select.replaceChildren();
   for(const name of Object.keys(p.snapshots.base.uv_layers||{})) {const opt=node('option',name);opt.value=name;select.append(opt);}
+  $('.uv-section').hidden=!select.options.length;
   const excluded=p.observed_exclusions||[];$('#exclusions').hidden=!excluded.length;
   $('#exclusion-list').replaceChildren(...excluded.slice(0,100).map(x=>node('li',typeof x==='string'?x:JSON.stringify(x))));
   notice(p.blockers.length?'Native apply blocked:\n'+p.blockers.map(b=>b.message||b.code||String(b)).join('\n'):'');
@@ -47,6 +48,9 @@ function setInspection(r){
 }
 function renderInspection(){
   const section=$('#inspection');section.hidden=!inspection;
+  document.body.classList.toggle('has-inspection',!!inspection);
+  for(const side of sides)$('#pair-state-'+side).textContent='';
+  $('#pair-history-summary').textContent='';
   if(!inspection)return;
   const usable=usableInspection();section.classList.toggle('stale',!usable);
   if(usable)$('#preview-label').textContent=geometryVariant==='merged'?'Inspected configured merge':geometryVariant+' branch alone · geometry comparison';
@@ -65,9 +69,11 @@ function renderInspection(){
   selectedPair=Math.min(previous,Math.max(0,select.options.length-1));select.value=String(selectedPair);select.disabled=!usable||!inspection.findings.length;
   for(const b of document.querySelectorAll('[data-geometry]')){b.disabled=!usable;b.setAttribute('aria-pressed',String(b.dataset.geometry===geometryVariant));}
   const detail=$('#inspection-detail');detail.replaceChildren();
-  if(!usable)return;
+  if(!usable){$('#pair-history-summary').textContent='Inspection is stale. Export choices and inspect again.';return;}
   if(!inspection.findings.length){detail.append(node('p','No retained interfering face pairs. Read the coverage limits before treating this as a negative result.'));return;}
   const f=inspection.findings[selectedPair];
+  $('#pair-history-summary').textContent=`Selected faces ${f.faces[0]} (yellow) / ${f.faces[1]} (violet) · ancestor ${f.history.base.kind} · left ${f.history.left.kind} · right ${f.history.right.kind} · combined ${f.history.merged.kind}`;
+  for(const side of sides){const kind=f.history[side==='result'?geometryVariant:side].kind;$('#pair-state-'+side).textContent=kind;$('#pair-state-'+side).dataset.kind=kind;}
   detail.append(node('h3',`Same faces, four states: ${f.faces.join(' ↔ ')}`));
   const history=node('div',undefined,'pair-history');
   for(const side of ['base','left','right','merged']){const p=node('p');p.append(node('b',side==='merged'?'Combined':side),node('span',f.history[side].kind));history.append(p);}detail.append(history);
@@ -110,10 +116,10 @@ function setupCanvas(canvas){
 }
 function drawMesh(side){
   const canvas=$('#mesh-'+side),{ctx,width,height}=setupCanvas(canvas);
-  ctx.strokeStyle='#2b352d';ctx.lineWidth=.5;
+  ctx.strokeStyle='#30353e';ctx.lineWidth=.5;
   for(let x=20;x<width;x+=28){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,height);ctx.stroke();}
   for(let y=20;y<height;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(width,y);ctx.stroke();}
-  if(!plan){ctx.fillStyle='#667664';ctx.font='11px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText('NATIVE MESH SNAPSHOT',width/2,height/2);return;}
+  if(!plan){ctx.fillStyle='#a4acb8';ctx.font='11px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText('NATIVE MESH SNAPSHOT',width/2,height/2);return;}
   const native=usableInspection()?inspection.geometry[side==='result'?geometryVariant:side]:null;
   const snapshot=side==='result'?plan.snapshots.right:plan.snapshots[side];
   const vertices=native?native.vertices:side==='result'?previewVertices(plan,choices):snapshot.vertices;
@@ -127,25 +133,25 @@ function drawMesh(side){
     if(side!=='base')for(const id of tri.ids){const e=edits.get(id);if(!e)continue;const visible=side==='result'||e.kind==='same'||e.kind==='conflict'||e.kind===side;if(visible){editColor=colors[e.kind];if(e.kind==='conflict')break;}}
     ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.lineTo(c.x,c.y);ctx.closePath();
     const witnessIndex=finding?.faces.indexOf(tri.face)??-1;
-    const faceColor=witnessIndex===0?'#edc65b':witnessIndex===1?'#cb91e6':null;
-    ctx.fillStyle=faceColor||editColor||`hsl(95 9% ${shade}%)`;ctx.globalAlpha=faceColor?.95:editColor?.86:1;ctx.fill();ctx.globalAlpha=1;
-    ctx.strokeStyle=wire?'#10160dcc':editColor?'#1e261b88':'#86947838';ctx.lineWidth=wire?.6:.35;ctx.stroke();
+    const faceColor=witnessIndex===0?'#ffe36d':witnessIndex===1?'#ad9dff':null;
+    ctx.fillStyle=faceColor||editColor||`hsl(220 6% ${shade}%)`;ctx.globalAlpha=faceColor?.95:editColor?.86:1;ctx.fill();ctx.globalAlpha=1;
+    ctx.strokeStyle=wire?'#101216cc':editColor?'#17191d88':'#b0b9c438';ctx.lineWidth=wire?.6:.35;ctx.stroke();
   }
-  if(projected.omittedFaces){ctx.fillStyle='#f0c24f';ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';ctx.fillText(`${projected.omittedFaces} degenerate/complex faces omitted; inspect in Blender`,12,height-12);}
-  if(native){ctx.fillStyle='#cad67c';ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';ctx.fillText(`Native triangles${side==='result'&&geometryVariant!=='merged'?' · '+geometryVariant+' branch alone':''}`,12,height-12);}
+  if(projected.omittedFaces){ctx.fillStyle='#f9d464';ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';ctx.fillText(`${projected.omittedFaces} degenerate/complex faces omitted; inspect in Blender`,12,height-12);}
+  if(native){ctx.fillStyle='#c7ced9';ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';ctx.fillText(`Native triangles${side==='result'&&geometryVariant!=='merged'?' · '+geometryVariant+' branch alone':''}`,12,height-12);}
   if(selected?.startsWith('vertex:')){
     const v=projected.points.find(v=>v.id===Number(selected.slice(7)));
-    if(v){ctx.beginPath();ctx.arc(v.x,v.y,6,0,2*Math.PI);ctx.strokeStyle='#e9f05c';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#e9f05c';ctx.font='10px ui-monospace,monospace';ctx.fillText(selected,v.x+10,v.y-10);}
+    if(v){ctx.beginPath();ctx.arc(v.x,v.y,6,0,2*Math.PI);ctx.strokeStyle='#ffe36d';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#ffe36d';ctx.font='10px ui-monospace,monospace';ctx.fillText(selected,v.x+10,v.y-10);}
   }
 }
 function drawUV(){
   const {ctx,width,height}=setupCanvas($('#uv-view'));const name=$('#uv-layer').value;
-  if(!plan||!name){ctx.fillStyle='#a7b2a6';ctx.font='11px ui-monospace,monospace';ctx.fillText('No UV layer captured.',16,30);return;}
+  if(!plan||!name){ctx.fillStyle='#b1bac6';ctx.font='11px ui-monospace,monospace';ctx.fillText('No UV layer captured.',16,30);return;}
   const layers=['base','left','right'].map(side=>plan.snapshots[side].uv_layers?.[name]||[]),all=layers.flat();
   let minU=0,maxU=1,minV=0,maxV=1;for(const c of all){minU=Math.min(minU,c.uv[0]);maxU=Math.max(maxU,c.uv[0]);minV=Math.min(minV,c.uv[1]);maxV=Math.max(maxV,c.uv[1]);}
   const scale=Math.min((width-40)/(maxU-minU||1),(height-30)/(maxV-minV||1));
   const x=u=>width/2+(u-(maxU+minU)/2)*scale,y=v=>height/2-(v-(maxV+minV)/2)*scale;
-  ctx.strokeStyle='#3f4b3f';ctx.strokeRect(x(0),y(1),scale,scale);
+  ctx.strokeStyle='#46505f';ctx.strokeRect(x(0),y(1),scale,scale);
   layers.forEach((layer,i)=>{
     const side=['base','left','right'][i];ctx.strokeStyle=colors[side];ctx.lineWidth=i===0?.6:1;ctx.globalAlpha=i===0?.45:.7;
     let offset=0;
@@ -161,7 +167,17 @@ function drawAll(){for(const side of sides)drawMesh(side);drawUV();}
 $('#open-plan').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>32*1024*1024)throw Error('Plan exceeds the studio 32 MiB limit.');setPlan(JSON.parse(await file.text()));}catch(error){notice(error.message);}finally{e.target.value='';}};
 $('#open-inspection').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(!plan)throw Error('Load the matching plan first.');if(file.size>32*1024*1024)throw Error('Inspection exceeds the studio 32 MiB limit.');setInspection(await parseInspectionText(await file.text()));}catch(error){notice(error.message);}finally{e.target.value='';}};
 $('#inspection-pair').onchange=e=>{selectedPair=Number(e.target.value);renderInspection();drawAll();};
-for(const b of document.querySelectorAll('[data-geometry]'))b.onclick=()=>{geometryVariant=b.dataset.geometry;renderInspection();drawAll();};
+function selectView(side){
+  if(!sides.includes(side))return;
+  for(const card of document.querySelectorAll('.mesh-card'))card.classList.toggle('selected-view',card.dataset.state===side);
+  for(const b of document.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===side));
+  drawAll();
+}
+for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>{
+  if(b.dataset.view==='result'){geometryVariant='merged';renderInspection();}
+  selectView(b.dataset.view);
+};
+for(const b of document.querySelectorAll('[data-geometry]'))b.onclick=()=>{geometryVariant=b.dataset.geometry;renderInspection();selectView('result');};
 $('#help-toggle').onclick=()=>{const hidden=!$('#workflow').hidden;$('#workflow').hidden=hidden;$('#help-toggle').setAttribute('aria-expanded',String(!hidden));};
 for(const b of document.querySelectorAll('[data-filter]'))b.onclick=()=>{filter=b.dataset.filter;visibleLimit=100;for(const x of document.querySelectorAll('[data-filter]'))x.setAttribute('aria-pressed',String(x===b));if(plan)renderChanges();};
 $('#search').oninput=()=>{visibleLimit=100;if(plan)renderChanges();};
