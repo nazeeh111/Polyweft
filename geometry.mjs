@@ -107,7 +107,7 @@ function tessellate(face, coordinates) {
   if(remaining.length===3) triangles.push(remaining.map(i=>face[i]));
   return {triangles,warning:false};
 }
-export function projectMesh(vertices,faces,yaw,pitch,zoom,width,height,frame=meshFrame(vertices)) {
+export function projectMesh(vertices,faces,yaw,pitch,zoom,width,height,frame=meshFrame(vertices),nativeTriangles=null) {
   const scale=Math.min(width,height)*.36*zoom/frame.radius;
   const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
   const points=vertices.map(v=>{
@@ -117,13 +117,16 @@ export function projectMesh(vertices,faces,yaw,pitch,zoom,width,height,frame=mes
   });
   const byId=new Map(points.map(v=>[v.id,v]));
   const triangles=[],coordinates=new Map(vertices.map(v=>[v.id,v.co]));
+  const nativeByFace=new Map();
+  if(nativeTriangles)for(const t of nativeTriangles){if(!nativeByFace.has(t.face))nativeByFace.set(t.face,[]);nativeByFace.get(t.face).push(t.vertices);}
   let omittedFaces=0;
-  for (const face of faces) {
-    const tessellation=tessellate(face,coordinates);
+  for (let faceIndex=0;faceIndex<faces.length;faceIndex++) {
+    const face=faces[faceIndex];
+    const tessellation=nativeTriangles?{triangles:nativeByFace.get(faceIndex)||[],warning:false}:tessellate(face,coordinates);
     if(tessellation.warning) omittedFaces++;
     for(const ids of tessellation.triangles) {
       const p=ids.map(id=>byId.get(id));
-      triangles.push({ids,points:p,depth:p.reduce((s,x)=>s+x.depth,0)/3});
+      triangles.push({ids,face:faceIndex,points:p,depth:p.reduce((s,x)=>s+x.depth,0)/3});
     }
   }
   triangles.sort((a,b)=>b.depth-a.depth);
