@@ -32,7 +32,28 @@ For your own scenes, **prepare the ancestor before branching**. Native capture a
 
 Two artists start from one prepared mesh. One changes a rim and its UV seam; another changes the body profile and material color. Polyweft keeps both independent edits. If both change the same XYZ vector, UV corner or admitted material input, you choose the complete ancestor, left or right value. It never invents a coordinate by mixing axes.
 
-The review displays actual captured geometry, UV corners and numerical values. Its combined mesh is a preview. The CLI rechecks the inputs, recomputes decisions, invokes Blender, saves a fresh `.blend`, reopens it and checks the admitted payload before publishing the output.
+The review displays actual captured geometry, UV corners and numerical values. Its combined mesh is a preview. Saving rechecks the inputs, recomputes decisions, invokes Blender, saves a fresh `.blend`, reopens it and checks the admitted payload before publishing the output.
+
+## Work inside Blender · extension preview
+
+The new native panel brings saved-file selection, whole-value choices, inspection and verified saving into Blender. It uses Blender's bundled Python, so the installed extension needs no pip, system Python or executable-path setup. Your active scene stays untouched. The browser becomes a read-only inspection snapshot; choices stay in the Blender panel.
+
+This is an **unreleased preview**. The installed operator workflow is verified on Blender 5.1.2 for macOS arm64; hands-on panel acceptance is still pending. The released command-line workflow is below. [Verification status](docs/VERIFICATION.md#native-extension-preview)
+
+From this source checkout, build the self-contained ZIP with Python 3.11+:
+
+```sh
+python tools/build_extension.py --output dist/polyweft-0.3.0.zip
+```
+
+Install it through **Preferences → Get Extensions → Install from Disk**, enable Polyweft, then open **3D View → Sidebar → Polyweft**.
+
+1. Prepare a saved ancestor before branching, then choose the ancestor, left and right files.
+2. Create a review and choose each competing whole value in the panel.
+3. Inspect the four saved states in the read-only browser view.
+4. Accept the limited payload scope and save to a new merged-copy path.
+
+Changing a choice or a monitored source-file property revokes the inspection and scope acceptance. Saving always rechecks source hashes and native captures. The extension targets macOS arm64 and Linux x64 with Blender 4.5+ and its matching bundled standalone Python; Windows is unavailable. [Full native workflow, recovery and cancellation](docs/BLENDER.md)
 
 ## Run it
 
@@ -107,7 +128,7 @@ Mesh merging has substantial prior art. [MeshGit](https://gfx.cse.taylor.edu/pro
 
 ## Verification
 
-The release workflow runs 32 Python checks, including real native Blender save/reopen, four-state surface capture and loopback HTTP boundaries, plus 13 Node preview/decision/inspection checks. Independent review compared 492 triangle pairs with a separate exact intersection test, checked native quad/ngon tessellation and repaired a display-coverage gap. Captured report bytes and complete/incomplete metadata are checked before browser display. The original merge review also checked published-file textures, shared mesh aliases, destination metadata and input bytes.
+The 0.2 release workflow ran 32 Python checks, including real native Blender save/reopen, four-state surface capture and loopback HTTP boundaries, plus 13 Node preview/decision/inspection checks. Independent review compared 492 triangle pairs with a separate exact intersection test, checked native quad/ngon tessellation and repaired a display-coverage gap. Captured report bytes and complete/incomplete metadata are checked before browser display. The original merge review also checked published-file textures, shared mesh aliases, destination metadata and input bytes. The extension preview adds owned-process, cancellation, stale-choice, read-only snapshot and reproducible-package checks; its remaining acceptance gate is recorded separately.
 
 See [the detailed evidence and limits](docs/VERIFICATION.md). Native verification establishes the declared supported payload, not artistic quality or geometric validity.
 
