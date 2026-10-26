@@ -112,8 +112,6 @@ Blender files are native binary projects. Auto-execution is disabled during load
 
 Whole-file version control cannot keep two independent edits inside one shared binary mesh by choosing only one file. Blender link/append is useful for separate assets, but does not reconcile those edits. Polyweft owns a deliberately narrower native write-back workflow.
 
-Mesh merging has substantial prior art. [MeshGit](https://gfx.cse.taylor.edu/projects/meshgit/meshgit-s13.pdf) is earlier research with more general topology correspondence. [BlenDiff](https://github.com/Vishrut2403/blendiff) compares a broader scene and documents mesh geometry as a manual write-back domain. Polyweft does not claim to invent mesh merging or replace either project's full scope. Its implementation and generated example are original; no third-party project code or evidence was copied.
-
 ## Verification
 
 The release workflow runs 32 Python checks, including real native Blender save/reopen, four-state surface capture and loopback HTTP boundaries, plus 13 Node preview/decision/inspection checks. Independent review compared 492 triangle pairs with a separate exact intersection test, checked native quad/ngon tessellation and repaired a display-coverage gap. Captured report bytes and complete/incomplete metadata are checked before browser display. The original merge review also checked published-file textures, shared mesh aliases, destination metadata and input bytes.
