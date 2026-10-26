@@ -2,19 +2,39 @@
 import {validatePlan,previewVertices,decisionDocument,meshFrame,projectMesh} from './geometry.mjs';
 import {parseInspectionText,validateInspection,inspectionMatches,inspectionStatus} from './inspection.mjs';
 const $=s=>document.querySelector(s), sides=['base','left','right','result'];
+const readOnly=new URLSearchParams(location.search).get('readonly')==='1';
+const managedMessage='Decisions are managed in Blender. This inspection snapshot cannot be changed here.';
 const colors={base:'#929aa5',left:'#ff8976',right:'#55d6e8',same:'#c7ced9',conflict:'#f9d464'};
 let plan=null,choices={},filter='all',selected=null,yaw=-.58,pitch=.46,zoom=1,wire=false,visibleLimit=100,frame=null;
 let inspection=null,selectedPair=0,geometryVariant='merged',choiceRevision=0;
 const notice=message=>{const el=$('#notice');el.textContent=message;el.hidden=!message;};
 function fmt(value){return Array.isArray(value)?'['+value.map(v=>Number(v.toPrecision(6))).join(', ')+']':String(Number(value.toPrecision(6)));}
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
+function renderSnapshotIdentity(){
+  if(!readOnly)return;
+  $('#snapshot-plan').textContent=plan?.id||'Unavailable';
+  $('#snapshot-inspection').textContent=inspection?.id||'Unavailable';
+}
+if(readOnly){
+  document.body.classList.add('readonly');
+  $('#snapshot-mode').hidden=false;
+  for(const id of ['open-plan','open-inspection','export-decisions'])$('#'+id).disabled=true;
+  for(const label of document.querySelectorAll('.open-files .file-button')){label.setAttribute('aria-disabled','true');label.title=managedMessage;}
+  $('#intro-description').textContent='Inspect the saved geometry and decisions from Blender. Return to Blender to change choices or create another inspection.';
+  $('#status').textContent='Loading inspection snapshot';
+  $('#export-summary').textContent=managedMessage;
+  $('#export-decisions').textContent='Decisions managed in Blender';
+  $('#help-toggle').textContent='Blender workflow';
+  $('#workflow').replaceChildren(node('h2','Continue in Blender'),node('p','Choose whole values in the Polyweft panel, then inspect again to open a new snapshot. Apply in Blender to save and reopen-verify a fresh scene. This saved browser snapshot does not update when choices change in Blender. Geometry, filters and view controls here only change the display.'));
+}
 function setPlan(p){
   validatePlan(p);plan=p;choices={};selected=null;visibleLimit=100;
   inspection=null;selectedPair=0;geometryVariant='merged';choiceRevision=0;$('#inspection').hidden=true;
   frame=meshFrame(['base','left','right'].flatMap(s=>p.snapshots[s].vertices));
   $('#mesh-name').textContent=p.snapshots.base.name||'Prepared target';
   $('#mesh-count').textContent=`${p.snapshots.base.vertices.length.toLocaleString()} vertices · ${p.snapshots.base.faces.length.toLocaleString()} faces · one prepared target`;
-  $('#identity').textContent='Plan '+p.id.slice(0,16)+' · local review';
+  $('#identity').textContent='Plan '+p.id.slice(0,16)+(readOnly?' · fixed snapshot':' · local review');
+  renderSnapshotIdentity();
   for(const side of ['base','left','right']){
     const source=p.sources?.[side];$('#hash-'+side).textContent=source?.sha256?.slice(0,12)||'captured snapshot';
     $('#hash-'+side).title=source?.sha256||'';
@@ -30,13 +50,13 @@ function setPlan(p){
 function refresh(){
   if(!plan)return;
   const conflicts=plan.changes.filter(c=>c.kind==='conflict'),unresolved=conflicts.filter(c=>!choices[c.key]);
-  $('#status').textContent=plan.blockers.length?'Refused native plan':unresolved.length?`${unresolved.length} choices remaining`:'Decisions ready for native apply';
+  $('#status').textContent=readOnly?(usableInspection()?'Fixed inspection snapshot':'Inspection snapshot unavailable'):plan.blockers.length?'Refused native plan':unresolved.length?`${unresolved.length} choices remaining`:'Decisions ready for native apply';
   $('#change-count').textContent=`${plan.changes.length.toLocaleString()} payload edits`;
   $('#conflict-count').textContent=`${conflicts.length} competing values · ${conflicts.length-unresolved.length} resolved`;
   $('#preview-label').textContent=unresolved.length?'Unresolved values show right':'All choices reflected';
-  $('#export-decisions').disabled=!!plan.blockers.length||!!unresolved.length;
-  $('#export-summary').textContent=plan.blockers.length?'Resolve structural blockers in Blender before merging.':unresolved.length?`Choose an entire value for each of ${unresolved.length} remaining conflicts.`:'Export choices, then let Blender save and verify a fresh scene.';
-  renderChanges();renderInspection();drawAll();
+  $('#export-decisions').disabled=readOnly||!!plan.blockers.length||!!unresolved.length;
+  $('#export-summary').textContent=readOnly?managedMessage:plan.blockers.length?'Resolve structural blockers in Blender before merging.':unresolved.length?`Choose an entire value for each of ${unresolved.length} remaining conflicts.`:'Export choices, then let Blender save and verify a fresh scene.';
+  renderSnapshotIdentity();renderChanges();renderInspection();drawAll();
 }
 function usableInspection(){return inspection&&plan&&inspectionMatches(inspection,plan,choices);}
 function pairFinding(){return usableInspection()?inspection.findings[selectedPair]:null;}
@@ -100,7 +120,7 @@ function renderChanges(){
     article.append(values);
     if(c.kind==='conflict'){
       const buttons=node('div',undefined,'choices');buttons.setAttribute('role','group');buttons.setAttribute('aria-label','Resolve '+(c.label||c.key));
-      for(const side of ['base','left','right']){const button=node('button',side==='base'?'Ancestor':side==='left'?'Keep left':'Keep right');button.setAttribute('aria-pressed',String(choices[c.key]===side));button.onclick=()=>{choices[c.key]=side;choiceRevision++;selected=c.key;geometryVariant='merged';refresh();};buttons.append(button);}
+      for(const side of ['base','left','right']){const button=node('button',side==='base'?'Ancestor':side==='left'?'Keep left':'Keep right');button.setAttribute('aria-pressed',String(choices[c.key]===side));button.disabled=readOnly;if(readOnly)button.title=managedMessage;button.onclick=()=>{if(readOnly){notice(managedMessage);return;}choices[c.key]=side;choiceRevision++;selected=c.key;geometryVariant='merged';refresh();};buttons.append(button);}
       article.append(buttons);
     }
     list.append(article);
@@ -164,8 +184,8 @@ function drawUV(){
   });
 }
 function drawAll(){for(const side of sides)drawMesh(side);drawUV();}
-$('#open-plan').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>32*1024*1024)throw Error('Plan exceeds the studio 32 MiB limit.');setPlan(JSON.parse(await file.text()));}catch(error){notice(error.message);}finally{e.target.value='';}};
-$('#open-inspection').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(!plan)throw Error('Load the matching plan first.');if(file.size>32*1024*1024)throw Error('Inspection exceeds the studio 32 MiB limit.');setInspection(await parseInspectionText(await file.text()));}catch(error){notice(error.message);}finally{e.target.value='';}};
+$('#open-plan').onchange=async e=>{try{if(readOnly){notice(managedMessage);return;}const file=e.target.files[0];if(!file)return;if(file.size>32*1024*1024)throw Error('Plan exceeds the studio 32 MiB limit.');setPlan(JSON.parse(await file.text()));}catch(error){notice(error.message);}finally{e.target.value='';}};
+$('#open-inspection').onchange=async e=>{try{if(readOnly){notice(managedMessage);return;}const file=e.target.files[0];if(!file)return;if(!plan)throw Error('Load the matching plan first.');if(file.size>32*1024*1024)throw Error('Inspection exceeds the studio 32 MiB limit.');setInspection(await parseInspectionText(await file.text()));}catch(error){notice(error.message);}finally{e.target.value='';}};
 $('#inspection-pair').onchange=e=>{selectedPair=Number(e.target.value);renderInspection();drawAll();};
 function selectView(side){
   if(!sides.includes(side))return;
@@ -186,9 +206,16 @@ $('#reset-view').onclick=()=>{yaw=-.58;pitch=.46;zoom=1;$('#zoom').value=1;drawA
 $('#wireframe').onchange=e=>{wire=e.target.checked;drawAll();};$('#zoom').oninput=e=>{zoom=Number(e.target.value);drawAll();};$('#uv-layer').onchange=drawUV;
 for(const side of sides){const canvas=$('#mesh-'+side);let drag=null;canvas.onpointerdown=e=>{drag=[e.clientX,e.clientY];canvas.setPointerCapture(e.pointerId);};canvas.onpointermove=e=>{if(!drag)return;yaw+=(e.clientX-drag[0])*.008;pitch=Math.max(-1.4,Math.min(1.4,pitch+(e.clientY-drag[1])*.008));drag=[e.clientX,e.clientY];drawAll();};canvas.onpointerup=()=>{drag=null;};canvas.onpointercancel=()=>{drag=null;};}
 $('#export-decisions').onclick=()=>{
+  if(readOnly){notice(managedMessage);return;}
   try{const data=decisionDocument(plan,choices),blob=new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=node('a');a.href=url;a.download='decisions.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);notice('Decisions exported. No Blender file has been written. Run the native apply command to save and verify the result.');}catch(error){notice(error.message);}
 };
 new ResizeObserver(()=>drawAll()).observe($('#workspace'));
-try{const response=await fetch('./plan.json',{cache:'no-store'});if(response.ok){const text=await response.text();if(text.length>32*1024*1024)throw Error('Plan exceeds the studio size limit.');setPlan(JSON.parse(text));}else if(response.status!==404)notice('Could not load plan.json. Use Open plan to select a local review.');}catch(error){notice('Open a local plan to begin. '+error.message);}
-if(plan){const loadedPlan=plan;try{const response=await fetch('./inspection.json',{cache:'no-store'});if(response.ok&&plan===loadedPlan){const text=await response.text();if(text.length>32*1024*1024)throw Error('Inspection exceeds the studio size limit.');const r=await parseInspectionText(text);if(plan===loadedPlan)setInspection(r);}else if(response.status!==404)notice('Could not load inspection.json.');}catch(error){notice('Inspection not loaded: '+error.message);}}
+try{const response=await fetch('./plan.json',{cache:'no-store'});if(response.ok){const text=await response.text();if(text.length>32*1024*1024)throw Error('Plan exceeds the studio size limit.');setPlan(JSON.parse(text));}else if(readOnly||response.status!==404)notice(readOnly?'Inspection snapshot unavailable: plan.json could not be loaded. Return to Blender and inspect again.':'Could not load plan.json. Use Open plan to select a local review.');}catch(error){notice((readOnly?'Inspection snapshot unavailable. Return to Blender and inspect again. ':'Open a local plan to begin. ')+error.message);}
+if(plan){const loadedPlan=plan;try{const response=await fetch('./inspection.json',{cache:'no-store'});if(response.ok&&plan===loadedPlan){const text=await response.text();if(text.length>32*1024*1024)throw Error('Inspection exceeds the studio size limit.');const r=await parseInspectionText(text);if(plan===loadedPlan)setInspection(r);}else if(readOnly||response.status!==404)notice(readOnly?'Inspection snapshot unavailable: inspection.json could not be loaded. Return to Blender and inspect again.':'Could not load inspection.json.');}catch(error){notice('Inspection not loaded: '+error.message);}}
+if(readOnly&&!usableInspection()){
+  $('#status').textContent='Inspection snapshot unavailable';
+  $('#preview-label').textContent='Uninspected preview only';
+  if(!$('#notice').textContent)notice('Inspection snapshot unavailable. Return to Blender and inspect again.');
+}
+renderSnapshotIdentity();
 drawAll();

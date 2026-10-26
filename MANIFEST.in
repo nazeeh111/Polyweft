@@ -2,5 +2,6 @@ include LICENSE README.md
 recursive-include src/polyweft/studio *
 recursive-include docs *.md *.png *.svg *.jpg *.gif *.json
 recursive-include tools *.py
+recursive-include extension *.py *.toml
 recursive-include tests *.py *.mjs *.json
 recursive-include examples *.json *.blend *.ppm *.png *.md
