@@ -78,6 +78,23 @@ class EngineTests(unittest.TestCase):
         self.assertNotEqual(plan_id(move), p["id"])
         self.assertRaises(ValueError, verify_plan, move)
 
+    def test_identity_preserves_shared_source_descriptor_behavior(self):
+        p = {
+            "sources": {
+                side: {"path": side + ".blend", "sha256": str(i) * 64}
+                for i, side in enumerate(("base", "left", "right"))
+            },
+            "payload": {"coordinates": [1, 2, 3]},
+        }
+        p["payload"]["source_alias"] = p["sources"]["base"]
+        original = copy.deepcopy(p)
+        self.assertEqual(
+            plan_id(p),
+            "1f3d0b0531b18740e164342d47de697bbc5a61c5db677e22992de28d234eb2d5",
+        )
+        self.assertEqual(p, original)
+        self.assertIs(p["payload"]["source_alias"], p["sources"]["base"])
+
     def test_tampered_operations_and_stale_extra_choices_rejected(self):
         b = snapshot()
         l = copy.deepcopy(b)
