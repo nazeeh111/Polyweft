@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="590" viewBox="0 0 840 590" role="img" aria-labelledby="title desc">
+<title id="title">Polyweft: merge values, inspect surfaces, verify native output</title>
+<desc id="desc">Ancestor, left and right scenes form a source-bound merge plan. Independent edits combine; each competing value requires a complete ancestor, left or right choice. Configured values feed optional four-state surface inspection and separate native apply. Inspection never saves a scene and becomes stale when choices change. Apply recaptures sources, saves a temporary scene and reopens and checks it before publishing a new blend file without overwrite. Surface inspection is not an apply gate or geometric guarantee.</desc>
+<rect width="840" height="590" fill="#17191d" rx="6"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="#bfc8d3" stroke-width="1.4"/></marker></defs>
+<text id="heading" x="28" y="38" fill="#f4f5f7" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700">Merge values. Inspect surfaces. Verify the save.</text>
+<text id="subheading" x="28" y="68" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400">A browser decision is not a saved Blender scene.</text>
+<rect id="scene-0" x="28" y="106" width="164" height="40" fill="#202328" stroke="#84909e" rx="4"/>
+<text id="scene-label-0" x="42" y="132" fill="#84909e" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Ancestor</text>
+<path id="scene-to-plan-0" d="M192 126H246V178H278" fill="none" stroke="#bfc8d3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect id="scene-1" x="28" y="157" width="164" height="40" fill="#202328" stroke="#ff8976" rx="4"/>
+<text id="scene-label-1" x="42" y="183" fill="#ff8976" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Left branch</text>
+<path id="scene-to-plan-1" d="M192 177H246V178H278" fill="none" stroke="#bfc8d3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect id="scene-2" x="28" y="208" width="164" height="40" fill="#202328" stroke="#55d6e8" rx="4"/>
+<text id="scene-label-2" x="42" y="234" fill="#55d6e8" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Right branch</text>
+<path id="scene-to-plan-2" d="M192 228H246V178H278" fill="none" stroke="#bfc8d3" stroke-width="2" marker-end="url(#arrow)"/>
+<text id="prepared-scope" x="28" y="282" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Prepared identities; unchanged topology.</text>
+<rect id="review" x="278" y="106" width="258" height="150" fill="#202328" stroke="#84909e" rx="4"/>
+<text id="review-title" x="296" y="135" fill="#f4f5f7" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">Review the merge plan</text>
+<text id="review-rule-0" x="296" y="167" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Independent edits: keep both.</text>
+<text id="review-rule-1" x="296" y="193" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Competing field: choose one</text>
+<text id="review-rule-2" x="296" y="219" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">whole ancestor, left or right value.</text>
+<path id="review-to-values" d="M536 178H590" fill="none" stroke="#bfc8d3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect id="values" x="590" y="106" width="222" height="150" fill="#202328" stroke="#f3e36b" rx="4"/>
+<text id="values-title" x="608" y="135" fill="#f3e36b" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">Configured values</text>
+<text id="values-detail-0" x="608" y="167" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">XYZ, UV, material defaults</text>
+<text id="values-detail-1" x="608" y="193" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">bound to the source plan.</text>
+<text id="values-detail-2" x="608" y="219" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Everything else: right scene.</text>
+<path id="values-to-inspect" d="M701 256V308H340V346" fill="none" stroke="#bfc8d3" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<path id="values-to-apply" d="M701 256V308H790V346" fill="none" stroke="#bfc8d3" stroke-width="2" marker-end="url(#arrow)"/>
+<text id="optional-label" x="28" y="331" fill="#f3e36b" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700">OPTIONAL SURFACE DIAGNOSIS</text>
+<text id="apply-label" x="425" y="331" fill="#f3e36b" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700">SEPARATE NATIVE APPLY</text>
+<rect id="inspect" x="28" y="346" width="326" height="150" fill="#202328" stroke="#84909e" rx="4"/>
+<text id="inspect-title" x="46" y="378" fill="#f4f5f7" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700">Compare all four states</text>
+<text id="inspect-detail-0" x="46" y="408" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Ancestor · left · right · combined</text>
+<text id="inspect-detail-1" x="46" y="434" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Report only; no native scene saved.</text>
+<text id="inspect-detail-2" x="46" y="460" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Changed choices need fresh inspection.</text>
+<rect id="apply" x="425" y="346" width="387" height="150" fill="#202328" stroke="#84909e" rx="4"/>
+<text id="apply-title" x="443" y="378" fill="#f4f5f7" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">Recapture → save temp → reopen</text>
+<text id="apply-detail-0" x="443" y="408" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Check the admitted payload and guards.</text>
+<text id="apply-detail-1" x="443" y="434" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Publish a new .blend only after checks.</text>
+<text id="apply-detail-2" x="443" y="460" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Existing output paths are refused.</text>
+<text id="limits-1" x="28" y="539" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">Inspection reports represented surface intersections, including unknown or incomplete cases.</text>
+<text id="limits-2" x="28" y="565" fill="#bfc8d3" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400">It is not required by apply, does not repair geometry and does not certify geometric validity.</text>
+</svg>

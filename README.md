@@ -34,6 +34,15 @@ Two artists start from one prepared mesh. One changes a rim and its UV seam; ano
 
 The review displays actual captured geometry, UV corners and numerical values. Its combined mesh is a preview. The CLI rechecks the inputs, recomputes decisions, invokes Blender, saves a fresh `.blend`, reopens it and checks the admitted payload before publishing the output.
 
+## From review to native output
+
+<picture>
+  <source media="(max-width: 650px)" srcset="docs/merge-workflow-mobile.svg">
+  <img src="docs/merge-workflow.svg" alt="Ancestor, left and right scenes form a source-bound merge plan. Choose complete values for conflicts. Configured values feed optional four-state surface inspection and separate native apply, which recaptures, saves a temporary scene and reopens and checks it before creating a new blend file.">
+</picture>
+
+Inspection diagnoses the configured surface; it neither saves a scene nor gates native apply. Changing a choice requires fresh inspection. Native apply independently checks the source-bound payload before publishing a new output. [Merge contract](docs/CONTRACT.md) · [Surface inspection limits](docs/INTERFERENCE.md)
+
 ## Run it
 
 Python 3.11+ and a local Blender executable are required. Official Blender 4.5.14 LTS is tested on Linux in CI; a local Blender 5.3 Alpha build is also tested. Other runtime/platform combinations are not yet verified. No account, AI API, cloud service or Python runtime dependency is required. Install the release wheel, or from a source checkout:
