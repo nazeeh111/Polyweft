@@ -74,10 +74,12 @@ def plan_id(plan):
     if type(plan) is not dict:
         raise ValueError("Plan must be an object")
     validate_sources(plan.get("sources"))
-    value = copy.deepcopy(plan)
+    value = plan.copy()
     value.pop("id", None)
-    for source in value.get("sources", {}).values():
-        source.pop("path", None)
+    value["sources"] = {
+        side: {"sha256": source["sha256"]}
+        for side, source in plan["sources"].items()
+    }
     return hashlib.sha256(canonical(value)).hexdigest()
 
 
