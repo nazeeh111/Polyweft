@@ -4,16 +4,9 @@
 
 **Merge Blender mesh edits. See what their combination creates.**
 
-[![Blender 4.5 LTS](https://img.shields.io/badge/Blender-4.5_LTS-F5792A?logo=blender&logoColor=white)](docs/VERIFICATION.md)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
-[![Four-state inspection](https://img.shields.io/badge/Surface_inspection-4_states-805AD5)](docs/INTERFERENCE.md)
-[![Native save and reopen](https://img.shields.io/badge/Native_output-save_%2B_reopen-239B83)](docs/CONTRACT.md)
-[![Verify](https://github.com/nazeeh111/Polyweft/actions/workflows/verify.yml/badge.svg)](https://github.com/nazeeh111/Polyweft/actions/workflows/verify.yml)
-[![GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-687280)](LICENSE)
-
 Two artists can edit different vertices without a value conflict and still create crossing surfaces when their edits combine. Polyweft reconciles prepared native `.blend` branches, then traces the same face pair through ancestor, left, right and configured result.
 
-**[Inspect the crossing-surface case →](https://nazeeh111.github.io/Polyweft/interference/)** · [Resolve competing edits →](https://nazeeh111.github.io/Polyweft/) · [Get the release](https://github.com/nazeeh111/Polyweft/releases)
+**[Inspect the crossing-surface case](https://nazeeh111.github.io/Polyweft/interference/)** · [Resolve competing edits](https://nazeeh111.github.io/Polyweft/) · [Get the release](https://github.com/nazeeh111/Polyweft/releases)
 
 <picture>
   <source media="(max-width: 650px)" srcset="docs/interference-mobile.gif">
@@ -116,7 +109,7 @@ Whole-file version control cannot keep two independent edits inside one shared b
 
 The release workflow runs 32 Python checks, including real native Blender save/reopen, four-state surface capture and loopback HTTP boundaries, plus 13 Node preview/decision/inspection checks. Independent review compared 492 triangle pairs with a separate exact intersection test, checked native quad/ngon tessellation and repaired a display-coverage gap. Captured report bytes and complete/incomplete metadata are checked before browser display. The original merge review also checked published-file textures, shared mesh aliases, destination metadata and input bytes.
 
-See [the detailed evidence and limits](docs/VERIFICATION.md). Native verification establishes the declared supported payload, not artistic quality or geometric validity.
+See [the detailed evidence and limits](docs/VERIFICATION.md), [hosted verification checks](https://github.com/nazeeh111/Polyweft/actions/workflows/verify.yml) and [Python package requirements](pyproject.toml). Native verification establishes the declared supported payload, not artistic quality or geometric validity.
 
 ## Develop
 
