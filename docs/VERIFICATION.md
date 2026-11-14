@@ -2,6 +2,18 @@
 
 The release gate uses real Blender files and actual processes. No browser animation substitutes for native merging.
 
+## Native extension preview
+
+The self-contained ZIP installed and registered in official Blender 5.1.2 on macOS arm64. Its bundled standalone Python 3.13.9 ran the owned workflow. One original generated eight-vertex, two-quad fixture exercised native preparation and review. Three competing whole values used XYZ from left, UV from right and material roughness from the ancestor. The installed operator workflow completed native inspection and saving with fresh reopen verification. All three input hashes and a dirty active editor's geometry, notes and saved-file bytes remained unchanged. Changing a choice revoked inspection and scope acceptance; saving then refused. Owned inspection, server and apply workers exited and were reaped.
+
+The actual browser displayed the exact matching plan, inspection and three choices. Imports, choices and export were disabled; rotation and filtering remained usable. This is a fixed snapshot, with the Blender panel as its decision authority.
+
+**Hands-on native panel acceptance remains pending.** The installed workflow above used Blender's operator and property APIs. The native input tool could capture the proof window but could not send mouse or keyboard input. This evidence does not establish click-by-click panel usability or a completed native release gate. The extension remains a preview; the existing 0.2.1 release is unchanged.
+
+Integration found a metadata-only false invalidation: permissions can change a file's change-time without changing its content. A disposable regression reproduced the refusal, and the early hint now monitors path, device, inode, size and modification time. Engine byte hashes and fresh captures remain authoritative. All retained source hashes matched the saved review; the original run's precise metadata change was not recorded, so that historical cause remains an inference. Recovery loaded the valid saved review without repeating preparation or plan capture.
+
+Independent review also reproduced a final-status race: a worker could publish completion between the parent's status read and observed exit. The parent now re-reads the final bounded receipt after worker exit before classifying completion. Focused checks cover late completion, cancellation, missing or malformed receipts, worker ownership and source/choice invalidation. Native geometry fixtures were not repeated for these process fixes.
+
 ## Four-state inspection
 
 The 0.2 release workflow runs 32 Python tests and 13 Node controls, with official Blender 4.5.14 LTS on Linux under Python 3.11 and 3.14. Locally, all 32 Python tests executed with the pinned Blender 5.3 Alpha build and no skipped native gate; all 13 Node controls passed. The workflow also generates and packages both original native examples.
@@ -24,4 +36,4 @@ Existing native source/output aliases, no scope acknowledgement, unresolved/unkn
 
 The target admission limits are 20,000 vertices, 20,000 faces, 80,000 corners (including all UV layers), eight material slots and 32 nodes per target material. These are resource bounds, not promises of performance on every scene. The studio uses a bounded dominant-axis triangulation for concave display; degenerate or overly complex faces are visibly omitted. Nonplanar display and Blender's exact native tessellation can differ.
 
-This does not establish arbitrary unprepared-scene correspondence, topology-changing merge, full-scene difference coverage, artistic quality, geometric validity or Blender parser security. All fields outside the admitted payload come from the right scene. Windows and official macOS stable Blender combinations remain untested. External asset path preservation is checked; arbitrary external-file content/version changes are not inferred as merge edits.
+This does not establish arbitrary unprepared-scene correspondence, topology-changing merge, full-scene difference coverage, artistic quality, geometric validity or Blender parser security. All fields outside the admitted payload come from the right scene. Windows remains untested. The new macOS 5.1.2 operator proof is scoped above and does not extend the historical 0.2 platform evidence. External asset path preservation is checked; arbitrary external-file content/version changes are not inferred as merge edits.

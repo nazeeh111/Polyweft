@@ -17,7 +17,7 @@ ALLOWED = {
 }
 
 
-def serve(folder, port=0):
+def create_server(folder, port=0):
     root = Path(folder).resolve(strict=True)
     if not root.is_dir():
         raise ValueError("Review directory is missing")
@@ -74,6 +74,11 @@ def serve(folder, port=0):
 
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     server.daemon_threads = True
+    return server
+
+
+def serve(folder, port=0):
+    server = create_server(folder, port)
     print(f"Polyweft review · http://127.0.0.1:{server.server_port}/", flush=True)
     try:
         server.serve_forever()
