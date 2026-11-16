@@ -9,9 +9,23 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from polyweft.core import canonical, plan_id, strict_load
 from polyweft.native import apply_plan, create_plan, prepare_source, source_info
+
+
+class BoundedNativeInputTests(unittest.TestCase):
+    def test_oversized_review_refused_without_path_read_bytes(self):
+        from polyweft.core import MAX_JSON
+        from polyweft.native import inspect_plan
+        with tempfile.TemporaryDirectory() as name:
+            review = Path(name) / "review"; review.mkdir()
+            with (review / "plan.json").open("wb") as stream:
+                stream.truncate(MAX_JSON + 1)
+            with patch.object(Path, "read_bytes", side_effect=AssertionError("unbounded read")):
+                with self.assertRaisesRegex(ValueError, "exceeds"):
+                    inspect_plan(review, Path(name) / "out", None, "unused")
 
 ROOT = Path(__file__).resolve().parents[1]
 
