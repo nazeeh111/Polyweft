@@ -6,13 +6,6 @@ jobs:
   native:
     runs-on: ubuntu-24.04
     env:
-      POLYWEFT_ISOLATION_ROOT: ${{ runner.temp }}/polyweft-isolation
-      BLENDER_USER_RESOURCES: ${{ runner.temp }}/polyweft-isolation/resources
-      BLENDER_USER_CONFIG: ${{ runner.temp }}/polyweft-isolation/config
-      BLENDER_USER_SCRIPTS: ${{ runner.temp }}/polyweft-isolation/scripts
-      BLENDER_USER_EXTENSIONS: ${{ runner.temp }}/polyweft-isolation/extensions
-      BLENDER_USER_DATAFILES: ${{ runner.temp }}/polyweft-isolation/datafiles
-      TMPDIR: ${{ runner.temp }}/polyweft-isolation/tmp
       OMP_NUM_THREADS: '2'
     strategy:
       fail-fast: false
@@ -20,7 +13,18 @@ jobs:
         python: ['3.11', '3.14']
     steps:
       - name: Prepare isolated Blender resources
-        run: mkdir -p "$BLENDER_USER_RESOURCES" "$BLENDER_USER_CONFIG" "$BLENDER_USER_SCRIPTS" "$BLENDER_USER_EXTENSIONS" "$BLENDER_USER_DATAFILES" "$TMPDIR"
+        run: |
+          isolation_root="$RUNNER_TEMP/polyweft-isolation"
+          mkdir -p "$isolation_root"/{resources,config,scripts,extensions,datafiles,tmp}
+          {
+            echo "POLYWEFT_ISOLATION_ROOT=$isolation_root"
+            echo "BLENDER_USER_RESOURCES=$isolation_root/resources"
+            echo "BLENDER_USER_CONFIG=$isolation_root/config"
+            echo "BLENDER_USER_SCRIPTS=$isolation_root/scripts"
+            echo "BLENDER_USER_EXTENSIONS=$isolation_root/extensions"
+            echo "BLENDER_USER_DATAFILES=$isolation_root/datafiles"
+            echo "TMPDIR=$isolation_root/tmp"
+          } >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
