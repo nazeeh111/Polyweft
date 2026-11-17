@@ -1,0 +1,98 @@
+{
+  "runtime": {
+    "version": "5.1.2",
+    "build_hash": "ec6e62d40fa9"
+  },
+  "initial": {
+    "schema": "polyweft.interference.example.v1",
+    "plan_id": "4496f7af3a730428562dc07d1f3ccf2b465e86226df2cf67c705d893ceb08ee2",
+    "inspection_id": "afc2631a892718b10861cc1e89df55bb749256f3250a2afc0578c8d6aa5bc8fe",
+    "runtime": {
+      "version": "5.1.2",
+      "build_hash": "ec6e62d40fa9"
+    },
+    "source_sha256": {
+      "base": "787aab782d2d7fcf908d349542e8b3791ce70c637878fd773a561abb474d152a",
+      "left": "7befc0737a394d3f4b4085fbb387230c64e3de938848f15221e37cacbd59dca5",
+      "right": "00e43f43e34d9954ebda8614faf35d90b1392d5f85b099a9865980bc6c139ba8"
+    },
+    "source_unchanged": true,
+    "native_vertices": 16,
+    "native_faces": 24,
+    "findings": 20,
+    "complete": true,
+    "published_native_surface_matches_inspection": true,
+    "merged_sha256": "ca6964f1415b5f7734565956119659a70ee4071d53f0802b07a2ffdc06771248"
+  },
+  "revised": {
+    "plan_id": "b849df66312487e25b22499efc141e086c23d55e86c0428bcf6cfa88d2a9b313",
+    "inspection_id": "cd9a3f9d8828f526b320785d99297029121aef649d6dd8ec3d0908232e1c5df7",
+    "summaries": {
+      "base": {
+        "crossings": 0,
+        "coplanar_overlaps": 0,
+        "contacts": 0,
+        "unknown_faces": [],
+        "unknown_pairs": 0
+      },
+      "left": {
+        "crossings": 0,
+        "coplanar_overlaps": 0,
+        "contacts": 0,
+        "unknown_faces": [],
+        "unknown_pairs": 0
+      },
+      "right": {
+        "crossings": 0,
+        "coplanar_overlaps": 0,
+        "contacts": 0,
+        "unknown_faces": [],
+        "unknown_pairs": 0
+      },
+      "merged": {
+        "crossings": 0,
+        "coplanar_overlaps": 0,
+        "contacts": 0,
+        "unknown_faces": [],
+        "unknown_pairs": 0
+      }
+    },
+    "sources_unchanged": {
+      "base": "787aab782d2d7fcf908d349542e8b3791ce70c637878fd773a561abb474d152a",
+      "left": "7befc0737a394d3f4b4085fbb387230c64e3de938848f15221e37cacbd59dca5",
+      "right": "00e43f43e34d9954ebda8614faf35d90b1392d5f85b099a9865980bc6c139ba8"
+    },
+    "native_apply": {
+      "schema": "polyweft.apply.receipt.v1",
+      "plan_id": "b849df66312487e25b22499efc141e086c23d55e86c0428bcf6cfa88d2a9b313",
+      "sources": {
+        "base": {
+          "path": "native/base.blend",
+          "sha256": "787aab782d2d7fcf908d349542e8b3791ce70c637878fd773a561abb474d152a"
+        },
+        "left": {
+          "path": "native/left.blend",
+          "sha256": "7befc0737a394d3f4b4085fbb387230c64e3de938848f15221e37cacbd59dca5"
+        },
+        "right": {
+          "path": "native/right-revised.blend",
+          "sha256": "47a9f07b3e2b90cd7da43995bf12d3d1ecb0c06405ea8be67de5013161b4e72b"
+        }
+      },
+      "output": {
+        "path": "native/revised.blend",
+        "sha256": "2ceaddf23cfc8d0f7da25203a4e57e4f693f950979f9a27896cf497784eeaa68"
+      },
+      "supported_changes": 16,
+      "conflict_choices": {},
+      "verified_fresh_reopen": true,
+      "input_bytes_unchanged": true,
+      "scope": "Only target mesh XYZ, UV corners and admitted material defaults are merged. Everything else comes from right. This is not a full-scene diff.",
+      "observed_exclusions": []
+    },
+    "fresh_native_surface_matches": true
+  },
+  "interpretation": "Revise trusted right branch in Blender, then recapture/reinspect. Original20crossings become0represented-face crossings/overlaps/contacts; this is not whole-scene or physical clearance.",
+  "source_parent": "534b42d19b55460b14ee8e617ac34b7e0d329da4",
+  "description": "Current-main trusted Flanges example. Revise only right vertices9..16 by+2X relative to its initial net\u22123X edit, giving net\u22121X from ancestor. Replan, inspect, apply and fresh-reopen. Exact represented-face scope only."
+}

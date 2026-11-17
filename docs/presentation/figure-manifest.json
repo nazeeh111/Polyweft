@@ -1,0 +1,34 @@
+{
+  "inputs": {
+    "crossing-inspection.json": "3214fffd3a3bc2836a21f21270550303bd934fd1717575c72cf4fe9c58ae1033",
+    "revised-inspection.json": "88560430bbbe9f2254e106300855541cc8475d39f3390c01285639986f5e9466"
+  },
+  "camera": {
+    "right": [
+      0.8253356149096783,
+      -0.5646424733950354,
+      0
+    ],
+    "up": [
+      0.219882135986551,
+      0.3214008270064177,
+      0.9210609940028851
+    ],
+    "center": [
+      0.75,
+      0,
+      0
+    ],
+    "projection": "orthographic",
+    "orthonormal": true
+  },
+  "scales": {
+    "desktop": 90,
+    "phone": 66
+  },
+  "triangleCounts": [
+    24,
+    24
+  ],
+  "meaning": "Each polygon is a native triangle; exact common scale on X/Y within each variant. Yellow line is first recorded crossing witness, not invented clearance."
+}

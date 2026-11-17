@@ -4,121 +4,59 @@
 
 **Merge Blender mesh edits. See what their combination creates.**
 
-Two artists can edit different vertices without a value conflict and still create crossing surfaces when their edits combine. Polyweft reconciles prepared native `.blend` branches, then traces the same face pair through ancestor, left, right and configured result.
+Two artists can edit different vertices without a value conflict and still create crossing surfaces. Polyweft reconciles prepared native `.blend` branches, then traces the same face pair through ancestor, left, right and configured result.
 
-**[Inspect the crossing-surface case](https://nazeeh111.github.io/Polyweft/interference/)** · [Resolve competing edits](https://nazeeh111.github.io/Polyweft/) · [Get the release](https://github.com/nazeeh111/Polyweft/releases)
+[Inspect the crossing-surface case](https://nazeeh111.github.io/Polyweft/interference/) · [Resolve competing edits](https://nazeeh111.github.io/Polyweft/) · [Releases](https://github.com/nazeeh111/Polyweft/releases)
 
 <picture>
   <source media="(max-width: 650px)" srcset="docs/interference-mobile.gif">
-  <img src="docs/interference-walkthrough.gif" alt="Recorded Polyweft interface comparing the same native face pair: ancestor, left and right are separated, but their configured combination crosses. The view exposes recorded exact witness coordinates and accepted edits.">
+  <img src="docs/interference-walkthrough.gif" alt="Recorded actual Polyweft studio: ancestor, left and right surfaces are separated, while their configured combination crosses. Exact native witness coordinates and accepted values remain visible.">
 </picture>
 
-**Actual studio, recorded native data.** Flanges has 16 independent edits, zero competing values and 20 crossing face pairs after combination. The recording compares complete branches, then exposes one retained witness. It uses the published Blender 4.5.14 LTS inspection, not a new geometry measurement or a native write from the browser. [Four-state still](docs/interference-studio.jpg) · [Narrow view](docs/interference-mobile.jpg) · [Recording route and source identities](docs/PRESENTATION.md)
+The original recording uses the published Blender 4.5.14 inspection, not a native browser write. [Original recording and source identities](docs/PRESENTATION.md).
 
-## Try the inspection
+## Revise the branch, then inspect again
 
-The linked studio works in your browser without installing Blender. Select a face pair; compare **Left branch alone**, **Right branch alone** and **Combined**; expand its history to see the native triangle witness and accepted vertex values. On narrow screens, use the **Ancestor / Left / Right / Combined** tabs for a full-width view.
-
-For your own scenes, **prepare the ancestor before branching**. Native capture and saving need Python 3.11+, a trusted Blender executable, durable prepared identities and unchanged topology. Exported decisions are JSON, not a saved `.blend`. The right branch supplies the destination scene; everything outside the admitted payload comes from right.
-
-## What you can do
-
-Two artists start from one prepared mesh. One changes a rim and its UV seam; another changes the body profile and material color. Polyweft keeps both independent edits. If both change the same XYZ vector, UV corner or admitted material input, you choose the complete ancestor, left or right value. It never invents a coordinate by mixing axes.
-
-The review displays actual captured geometry, UV corners and numerical values. Its combined mesh is a preview. The CLI rechecks the inputs, recomputes decisions, invokes Blender, saves a fresh `.blend`, reopens it and checks the admitted payload before publishing the output.
-
-## From review to native output
+The new [native revision case](docs/presentation/README.md) follows the complete loop: **20 crossing face pairs → revise the right branch in Blender → replan and inspect → 0 represented-face crossings → apply and freshly reopen**. Both results retain the same prepared topology. Zero here concerns the stated represented-face model, not whole-scene collision or physical clearance.
 
 <picture>
-  <source media="(max-width: 650px)" srcset="docs/merge-workflow-mobile.svg">
-  <img src="docs/merge-workflow.svg" alt="Ancestor, left and right scenes form a source-bound merge plan. Choose complete values for conflicts. Configured values feed optional four-state surface inspection and separate native apply, which recaptures, saves a temporary scene and reopens and checks it before creating a new blend file.">
+  <source media="(max-width: 650px)" srcset="docs/presentation/revision-mobile.png">
+  <img src="docs/presentation/revision.png" alt="Exact native combined surfaces share one orthographic camera and scale. Original edits have 20 crossing face pairs. Revising the right translation from minus 3 to minus 1 X yields zero within the complete represented-face inspection, then native output is freshly reopened.">
 </picture>
 
-Inspection diagnoses the configured surface; it neither saves a scene nor gates native apply. Changing a choice requires fresh inspection. Native apply independently checks the source-bound payload before publishing a new output. [Merge contract](docs/CONTRACT.md) · [Surface inspection limits](docs/INTERFERENCE.md)
+[Portable native case and complete software source](docs/presentation/native-revision.zip) · [Exact recorded geometry](docs/presentation/revised-inspection.json) · [True phone capture](docs/presentation/revised-375.png).
 
-## Run it
+## Run the native workflow
 
-Python 3.11+ and a local Blender executable are required. Official Blender 4.5.14 LTS is tested on Linux in CI; a local Blender 5.3 Alpha build is also tested. Other runtime/platform combinations are not yet verified. No account, AI API, cloud service or Python runtime dependency is required. Install the release wheel, or from a source checkout:
+Python 3.11+ and a trusted local Blender executable are required. There are no Python runtime dependencies, accounts or model services.
 
 ```sh
 python -m pip install .
-```
-
-For an installation without a source checkout, download the wheel from the release and run `python -m pip install /path/to/polyweft-0.2.1-py3-none-any.whl`.
-
-Prepare a common ancestor **before** either artist branches:
-
-```sh
 polyweft prepare model.blend --object Shell --output base.blend --blender /path/to/blender
-```
-
-Save your edits as `left.blend` and `right.blend`, then capture and review:
-
-```sh
+# Branch from prepared base.blend, then save left.blend and right.blend.
 polyweft plan base.blend left.blend right.blend --output review --blender /path/to/blender
-polyweft studio review --port 6395
+polyweft studio review --port 0
 ```
 
-Open the loopback address printed by the studio, resolve each competing value, and export `decisions.json`. Save the result:
+Choose complete ancestor, left or right values for conflicts, then export decisions.json. The browser compares captured geometry and exports choices; it does not save Blender files.
 
 ```sh
+polyweft inspect review --decisions decisions.json --output inspected --blender /path/to/blender
+polyweft studio inspected --port 0
 polyweft apply review --decisions decisions.json --output merged.blend \
   --accept-payload-scope --blender /path/to/blender
 ```
 
-Download the **Blender 4.5 native Tide example** from the release assets, extract it, and run `polyweft plan` on its three branch files to create a local review. The public demo replaces machine paths with labels; it is for review, not direct native apply.
-
-Inspect the configured combination before applying it:
-
-```sh
-polyweft inspect review --decisions decisions.json --output inspected --blender /path/to/blender
-polyweft studio inspected --port 6395
-```
-
-Omit `--decisions` for a conflict-free review. Inspection recaptures the exact source files and builds the combined surface in memory, without saving a source scene. The output is a new read-only review bundle with `inspection.json`. It uses Blender's actual triangles separately in every state, including changes in how a quad or concave face is split. Keep the original report file unchanged for its checksum. Its recorded choices load into the studio; changing a choice immediately makes the inspection stale. Export the new choices and rerun `inspect` to obtain new evidence.
-
-The original **Flanges** release bundle includes the three source files, a saved merged scene, fresh reopen evidence and complete corresponding software source. Its deliberate crossings demonstrate why independent field edits still need geometric review. The report records intersections; it does not edit the branch files. Revise an edit in Blender and capture a new plan when you want a different surface.
-
-No conflicts? Omit `--decisions`. The output must be new. The command refuses unresolved conflicts, changed source bytes, manipulated plans, unsupported structure and existing output paths. Review directories can contain local paths and labels; inspect them before sharing.
-
-## Native scene output
-
-![Retained Tide native merged scene rendered with Blender](docs/tide-native.png)
-
-Tide demonstrates the separate vertex, UV and material reconciliation workflow and native scene output. The Flanges recording above demonstrates newly crossing surfaces. [Open Tide review](https://nazeeh111.github.io/Polyweft/) · [Native verification and limits](docs/VERIFICATION.md)
+Omit decisions for a conflict-free plan. Inspect again after changing choices or branch geometry. Inspection neither saves a scene nor gates apply; native apply separately rechecks exact sources and payload, saves a new file and freshly reopens it. Existing outputs, changed sources, unresolved conflicts and unsupported structure are refused.
 
 ## Scope
 
-| Admitted payload | Unit of reconciliation |
-| --- | --- |
-| Vertex positions | One complete XYZ vector per prepared vertex identity |
-| UV coordinates | One complete UV pair per face-corner identity and UV layer |
-| Material defaults | Admitted Principled Base Color and Roughness inputs |
+- Reconcile complete XYZ vectors, per-corner UV pairs and admitted Principled Base Color/Roughness inputs. It never mixes coordinate axes to invent a value.
+- Prepare before branching; retain durable identities and unchanged topology. Outside the admitted payload, **everything comes from right**. This is not a whole-scene merge or arbitrary mesh correspondence.
+- Surface inspection covers distinct native target polygon faces in object-local coordinates. Incomplete coverage never establishes separation. Other objects, solid containment, within-face folding, evaluated modifiers, artistic intent and physical tolerances remain outside scope.
 
-**Everything outside this payload comes from right. This is not a whole-scene merge or an exhaustive scene diff.** Observed excluded changes appear in the review, but that list is not a complete inventory of every Blender feature.
+The new case ran on installed **Blender 5.1.2**, with 33 native/core Python tests and 13 Node tests passing. It does not replace the published Linux 4.5 LTS acceptance or establish held extension/workflow changes. Blender auto-execution is disabled; a trusted executable and trusted artwork are still required.
 
-The prepared target needs unchanged topology and durable identities. Linked data, shape keys, unsupported modifier/group structure, graph rewiring and structural target changes are refused. Polyweft does not infer correspondence in arbitrary unprepared scenes or merge topology edits. Geometry that combines cleanly can still intersect itself or produce an undesirable artistic result; inspect it in Blender.
+[Full original guide](TECHNICAL_GUIDE.md) · [Merge contract](docs/CONTRACT.md) · [Inspection limits](docs/INTERFERENCE.md) · [Original verification](docs/VERIFICATION.md) · [Contributing](CONTRIBUTING.md).
 
-Blender files are native binary projects. Auto-execution is disabled during loading, but Blender itself is not a sandbox for hostile files. Use trusted assets and a trusted Blender executable.
-
-## Why this exists
-
-Whole-file version control cannot keep two independent edits inside one shared binary mesh by choosing only one file. Blender link/append is useful for separate assets, but does not reconcile those edits. Polyweft owns a deliberately narrower native write-back workflow.
-
-## Verification
-
-The release workflow runs 32 Python checks, including real native Blender save/reopen, four-state surface capture and loopback HTTP boundaries, plus 13 Node preview/decision/inspection checks. Independent review compared 492 triangle pairs with a separate exact intersection test, checked native quad/ngon tessellation and repaired a display-coverage gap. Captured report bytes and complete/incomplete metadata are checked before browser display. The original merge review also checked published-file textures, shared mesh aliases, destination metadata and input bytes.
-
-See [the detailed evidence and limits](docs/VERIFICATION.md), [hosted verification checks](https://github.com/nazeeh111/Polyweft/actions/workflows/verify.yml) and [Python package requirements](pyproject.toml). Native verification establishes the declared supported payload, not artistic quality or geometric validity.
-
-## Develop
-
-```sh
-python -m pip install .
-python -m unittest discover -s tests -v
-node --test tests/*.test.mjs
-```
-
-Set `POLYWEFT_BLENDER` to run the real native integration tests. Hosted release checks require the native tests to execute. See [contributing](CONTRIBUTING.md) for the evidence needed when changing admission or write-back.
-
-Licensed [GPL-3.0-or-later](LICENSE). User artwork and data remain their authors' property.
+Licensed [GPL-3.0-or-later](LICENSE). User artwork and data remain their authors' property. No hardware or fabrication claim.
