@@ -4,3 +4,7 @@ recursive-include docs *.md *.png *.svg *.jpg *.gif *.json
 recursive-include tools *.py
 recursive-include tests *.py *.mjs *.json
 recursive-include examples *.json *.blend *.ppm *.png *.md
+
+# Keep the exact new native reader, sources and media in the source distribution.
+recursive-include docs/presentation *
+include TECHNICAL_GUIDE.md
