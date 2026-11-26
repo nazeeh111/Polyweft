@@ -1,6 +1,6 @@
 # Polyweft inside Blender
 
-The extension is an **unreleased preview**. Build the self-contained `polyweft-0.3.0.zip` from this source checkout using the command below, then install it through **Preferences → Get Extensions → Install from Disk**. Enable Polyweft, then open **3D View → Sidebar → Polyweft**. The ZIP contains the engine, browser inspection and license. After building it, no pip installation, system Python, account or runtime download is needed. [Current verification and remaining gate](VERIFICATION.md#native-extension-preview)
+[Download the preview ZIP](https://github.com/nazeeh111/Polyweft/releases/download/v0.3.0-preview.1/polyweft-0.3.0.zip) or [build it from source](#build-from-source). Install it through **Preferences → Get Extensions → Install from Disk**. Enable Polyweft, then open **3D View → Sidebar → Polyweft**. The ZIP contains the engine, browser inspection and license. The installed extension uses Blender’s bundled Python. [Current verification and remaining gate](VERIFICATION.md#native-extension-preview)
 
 The extension targets Blender 4.5 or newer on macOS arm64 and Linux x64. It requires that Blender ships a matching standalone Python under its Python installation's `bin` directory. If that interpreter is missing or its major/minor version differs, Polyweft refuses the operation with a controlled diagnostic. Windows is unavailable in this version. Targeted platforms are not a claim that every Blender/platform combination has been tested; see the release verification record.
 
