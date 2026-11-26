@@ -1,0 +1,16 @@
+schema_version = "1.0.0"
+id = "polyweft"
+version = "0.3.0"
+name = "Polyweft"
+tagline = "Review prepared mesh branches and save a verified merged copy"
+maintainer = "Nazeeh"
+type = "add-on"
+website = "https://github.com/nazeeh111/Polyweft"
+tags = ["Mesh", "Pipeline"]
+blender_version_min = "4.5.0"
+license = ["SPDX:GPL-3.0-or-later"]
+platforms = ["macos-arm64", "linux-x64"]
+
+[permissions]
+files = "Read chosen local branches and write new verified outputs and recovery jobs"
+network = "Show a read-only inspection through an owned localhost server"

@@ -4,7 +4,6 @@ import hashlib
 import json
 import os
 import shutil
-import subprocess
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
@@ -15,9 +14,11 @@ from .core import (
     canonical,
     flatten,
     resolve_decisions,
-    strict_load,
+    load_json_file,
     verify_plan,
 )
+
+from .jobs import checkpoint, publish, run_native
 
 MAX_BLEND = 512 * 1024 * 1024
 TIMEOUT = 90
@@ -32,12 +33,14 @@ STUDIO_FILES = (
 
 
 def source_info(path):
+    checkpoint("Checking saved source bytes")
     path = Path(path).expanduser().resolve(strict=True)
     if not path.is_file() or path.stat().st_size > MAX_BLEND:
         raise ValueError("Native source must be a regular file no larger than 512 MiB")
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
+            checkpoint()
             digest.update(block)
     return {"path": str(path), "sha256": digest.hexdigest()}
 
@@ -83,12 +86,8 @@ def bridge(blender, request, folder):
         target = folder / key.lower()
         target.mkdir(exist_ok=True)
         environment[key] = str(target)
-    result = subprocess.run(
+    result = run_native(
         command,
-        check=False,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
         timeout=TIMEOUT,
         env=environment,
     )
@@ -97,7 +96,7 @@ def bridge(blender, request, folder):
             "Blender bridge failed before producing a response. "
             + result.stdout[-2000:].decode("utf-8", "replace")
         )
-    response = strict_load(response_path.read_bytes())
+    response = load_json_file(response_path)
     if result.returncode or not response.get("ok"):
         raise ValueError(
             "Native admission/operation failed: "
@@ -138,7 +137,7 @@ def native_temp(parent):
 
 def publish_native(temp, output):
     # Hard link publication is atomic no-clobber within this output filesystem.
-    os.link(temp, output)
+    publish(lambda: os.link(temp, output))
 
 
 def _check_sources(sources):
@@ -200,6 +199,25 @@ def studio_root():
     )
 
 
+def _publish_bundle(bundle, destination, filenames):
+    # Exclusive reservation prevents replacing even an existing empty directory.
+    destination.mkdir()
+    created = []
+    try:
+        for filename in filenames:
+            target = destination / filename
+            os.link(bundle / filename, target)
+            created.append(target)
+    except BaseException:
+        for target in created:
+            target.unlink()
+        try:
+            destination.rmdir()
+        except OSError:
+            pass
+        raise
+
+
 def create_plan(base, left, right, output, blender):
     sources = {
         side: source_info(path)
@@ -240,22 +258,7 @@ def create_plan(base, left, right, output, blender):
                     "Studio asset missing or not a regular file: " + filename
                 )
             shutil.copyfile(src, bundle / filename)
-        # Exclusive reservation prevents POSIX rename from replacing an empty directory.
-        destination.mkdir()
-        created = []
-        try:
-            for filename in (*STUDIO_FILES, "plan.json"):
-                target = destination / filename
-                os.link(bundle / filename, target)
-                created.append(target)
-        except BaseException:
-            for target in created:
-                target.unlink()
-            try:
-                destination.rmdir()
-            except OSError:
-                pass
-            raise
+        publish(lambda: _publish_bundle(bundle, destination, (*STUDIO_FILES, "plan.json")))
     return plan
 
 
@@ -266,8 +269,8 @@ def inspect_plan(review, output, decisions, blender):
     review = Path(review).resolve(strict=True)
     if not review.is_dir() or (review / "plan.json").is_symlink():
         raise ValueError("Review must contain a regular plan.json")
-    plan = verify_plan(strict_load((review / "plan.json").read_bytes()))
-    supplied = None if decisions is None else strict_load(Path(decisions).read_bytes())
+    plan = verify_plan(load_json_file(review / "plan.json"))
+    supplied = None if decisions is None else load_json_file(decisions)
     values = resolve_decisions(plan, supplied)
     _check_sources(plan["sources"])
     destination = new_output(output)
@@ -337,21 +340,7 @@ def inspect_plan(review, output, decisions, blender):
             if not source.is_file() or source.is_symlink():
                 raise ValueError("Installed studio asset is missing: " + filename)
             shutil.copyfile(source, bundle / filename)
-        destination.mkdir()
-        created = []
-        try:
-            for filename in (*STUDIO_FILES, "plan.json", "inspection.json"):
-                target = destination / filename
-                os.link(bundle / filename, target)
-                created.append(target)
-        except BaseException:
-            for target in created:
-                target.unlink()
-            try:
-                destination.rmdir()
-            except OSError:
-                pass
-            raise
+        publish(lambda: _publish_bundle(bundle, destination, (*STUDIO_FILES, "plan.json", "inspection.json")))
         return report
 
 
@@ -361,8 +350,8 @@ def apply_plan(review, output, decisions, blender, accept_scope=False):
     review = Path(review).resolve(strict=True)
     if not review.is_dir() or (review / "plan.json").is_symlink():
         raise ValueError("Review must contain a regular plan.json")
-    original_plan = verify_plan(strict_load((review / "plan.json").read_bytes()))
-    supplied = None if decisions is None else strict_load(Path(decisions).read_bytes())
+    original_plan = verify_plan(load_json_file(review / "plan.json"))
+    supplied = None if decisions is None else load_json_file(decisions)
     expected_values = resolve_decisions(original_plan, supplied)
     sources = original_plan["sources"]
     _check_sources(sources)
