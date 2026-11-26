@@ -38,7 +38,7 @@ polyweft plan base.blend left.blend right.blend --output review --blender /path/
 polyweft studio review --port 0
 ```
 
-Choose complete ancestor, left or right values for conflicts, then export decisions.json. The browser compares captured geometry and exports choices; it does not save Blender files.
+In this source preview, the browser is read-only. Use the native extension panel below for whole-value choices, or supply decisions.json to the existing CLI. The browser compares captured geometry; it does not save Blender files.
 
 ```sh
 polyweft inspect review --decisions decisions.json --output inspected --blender /path/to/blender
@@ -48,6 +48,28 @@ polyweft apply review --decisions decisions.json --output merged.blend \
 ```
 
 Omit decisions for a conflict-free plan. Inspect again after changing choices or branch geometry. Inspection neither saves a scene nor gates apply; native apply separately rechecks exact sources and payload, saves a new file and freshly reopens it. Existing outputs, changed sources, unresolved conflicts and unsupported structure are refused.
+
+## Work inside Blender · extension preview
+
+The new native panel brings saved-file selection, whole-value choices, inspection and verified saving into Blender. It uses Blender's bundled Python, so the installed extension needs no pip, system Python or executable-path setup. Your active scene stays untouched. The browser becomes a read-only inspection snapshot; choices stay in the Blender panel.
+
+This is an **unreleased preview**. The installed operator workflow is verified on Blender 5.1.2 for macOS arm64; hands-on panel acceptance is still pending. The released command-line workflow is below. [Verification status](docs/VERIFICATION.md#native-extension-preview)
+
+From this source checkout, build the self-contained ZIP with Python 3.11+:
+
+```sh
+python tools/build_extension.py --output dist/polyweft-0.3.0.zip
+```
+
+Install it through **Preferences → Get Extensions → Install from Disk**, enable Polyweft, then open **3D View → Sidebar → Polyweft**.
+
+1. Prepare a saved ancestor before branching, then choose the ancestor, left and right files.
+2. Create a review and choose each competing whole value in the panel.
+3. Inspect the four saved states in the read-only browser view.
+4. Accept the limited payload scope and save to a new merged-copy path.
+
+Changing a choice or a monitored source-file property revokes the inspection and scope acceptance. Saving always rechecks source hashes and native captures. The extension targets macOS arm64 and Linux x64 with Blender 4.5+ and its matching bundled standalone Python; Windows is unavailable. [Full native workflow, recovery and cancellation](docs/BLENDER.md)
+
 
 ## Scope
 

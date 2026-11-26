@@ -52,6 +52,15 @@ def strict_load(raw):
         raise ValueError("Invalid bounded JSON") from e
 
 
+def load_json_file(path, limit=MAX_JSON):
+    """Bound allocation even if a file grows while it is being read."""
+    with open(path, "rb") as stream:
+        raw = stream.read(limit + 1)
+    if len(raw) > limit:
+        raise ValueError("JSON exceeds its size limit")
+    return strict_load(raw)
+
+
 def validate_sources(sources):
     if type(sources) is not dict or set(sources) != {"base", "left", "right"}:
         raise ValueError("Exactly three source descriptors required")

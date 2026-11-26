@@ -5,11 +5,26 @@ permissions:
 jobs:
   native:
     runs-on: ubuntu-24.04
+    env:
+      OMP_NUM_THREADS: '2'
     strategy:
       fail-fast: false
       matrix:
         python: ['3.11', '3.14']
     steps:
+      - name: Prepare isolated Blender resources
+        run: |
+          isolation_root="$RUNNER_TEMP/polyweft-isolation"
+          mkdir -p "$isolation_root"/{resources,config,scripts,extensions,datafiles,tmp}
+          {
+            echo "POLYWEFT_ISOLATION_ROOT=$isolation_root"
+            echo "BLENDER_USER_RESOURCES=$isolation_root/resources"
+            echo "BLENDER_USER_CONFIG=$isolation_root/config"
+            echo "BLENDER_USER_SCRIPTS=$isolation_root/scripts"
+            echo "BLENDER_USER_EXTENSIONS=$isolation_root/extensions"
+            echo "BLENDER_USER_DATAFILES=$isolation_root/datafiles"
+            echo "TMPDIR=$isolation_root/tmp"
+          } >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -32,6 +47,14 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Browser preview and decision controls
         run: node --test tests/*.test.mjs
+      - name: Build and install the self-contained Blender extension
+        run: |
+          python tools/build_extension.py --output extension-dist/polyweft-0.3.0.zip
+          "$POLYWEFT_BLENDER" --background --factory-startup --disable-autoexec --offline-mode --python-exit-code 1 --python tools/check_extension_install.py -- "$PWD/extension-dist/polyweft-0.3.0.zip"
+      - name: Installed workflow and native cancellation
+        if: matrix.python == '3.11'
+        run: |
+          "$POLYWEFT_BLENDER" --background --factory-startup --disable-autoexec --offline-mode --threads 2 --python-exit-code 1 --python tools/check_installed_workflow.py -- "$PWD/extension-dist/polyweft-0.3.0.zip" "$RUNNER_TEMP/polyweft-acceptance"
       - name: Installed console script
         working-directory: /tmp
         run: polyweft --help

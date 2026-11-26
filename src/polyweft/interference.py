@@ -11,6 +11,7 @@ import time
 from fractions import Fraction as F
 
 from .core import canonical, resolve_decisions, verify_plan
+from .jobs import checkpoint
 
 STATES = ("base", "left", "right", "merged")
 INTERFERENCE_SCOPE = "Between distinct native tessellated target polygon faces in object-local coordinates only. This is not solid collision, within-polygon distortion, physical clearance, artistic validity or all-scene safety."
@@ -79,6 +80,7 @@ def _prepare_geometry(plan, decisions, geometry, limits):
         offset += len(vertices)
     prepared = {}
     for state in STATES:
+        checkpoint("Checking captured surface geometry")
         g = geometry[state]
         if type(g) is not dict or not {
             "vertices",
@@ -121,6 +123,7 @@ def _prepare_geometry(plan, decisions, geometry, limits):
         triangles = []
         seen = set()
         for index, triangle in enumerate(g["triangles"]):
+            checkpoint()
             if type(triangle) is not dict or set(triangle) != {
                 "face",
                 "vertices",
@@ -163,6 +166,7 @@ def _prepare_geometry(plan, decisions, geometry, limits):
             if len(set(vertices)) != 3 or normal(tri) == (0, 0, 0):
                 unknown.add(face)
         for face, indices in by_face.items():
+            checkpoint()
             if len(indices) != len(base["faces"][face]) - 2:
                 unknown.add(face)
             if indices:
@@ -216,6 +220,7 @@ def inspect_surfaces(plan, decisions, geometry, runtime, limits=None):
             reasons.append(message)
 
     def expired():
+        checkpoint()
         if time.monotonic() - started >= limits["max_seconds"]:
             reason("Inspection time limit reached")
             return True
