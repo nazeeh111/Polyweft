@@ -1,30 +1,27 @@
-<p><img src="src/polyweft/studio/mark.svg" width="40" alt="Polyweft"></p>
-
 # Polyweft
 
-**Merge Blender mesh edits. See what their combination creates.**
+**Both branches had separated surfaces. Their merge crossed.** On the prepared Blender mesh below, two independent edits merged without a value conflict but created **20 crossing face pairs**. Changing the right branch’s translation from **−3 X to −1 X** brought the count to **0** on the inspected target faces. The revised Blender file was saved and reopened.
 
-Two artists can edit different vertices without a value conflict and still create crossing surfaces. Polyweft reconciles prepared native `.blend` branches, then traces the same face pair through ancestor, left, right and configured result.
+[Try the crossing case in your browser](https://nazeeh111.github.io/Polyweft/interference/) · [Download the Blender extension preview](https://github.com/nazeeh111/Polyweft/releases/download/v0.3.0-preview.1/polyweft-0.3.0.zip)
 
-[Inspect the crossing-surface case](https://nazeeh111.github.io/Polyweft/interference/) · [Resolve competing edits](https://nazeeh111.github.io/Polyweft/) · [Releases](https://github.com/nazeeh111/Polyweft/releases)
+<picture>
+  <source media="(max-width: 650px)" srcset="docs/presentation/revision-compact.svg">
+  <img src="docs/presentation/revision.png" alt="The same two Blender surfaces at the same camera angle and scale. Their original merge has 20 crossing face pairs and a marked crossing witness. Revising the right translation to minus 1 X yields zero in the represented target-face inspection.">
+</picture>
+
+The image projects the recorded native triangles and highlights one exact crossing witness. [Replay the native branch revision](docs/presentation/README.md) · [Inspect the exact geometry](docs/presentation/revised-inspection.json) · [Open the recorded phone workbench](docs/presentation/revised-375.png)
+
+<details>
+<summary>Original workbench walkthrough</summary>
 
 <picture>
   <source media="(max-width: 650px)" srcset="docs/interference-mobile.gif">
-  <img src="docs/interference-walkthrough.gif" alt="Recorded actual Polyweft studio: ancestor, left and right surfaces are separated, while their configured combination crosses. Exact native witness coordinates and accepted values remain visible.">
+  <img src="docs/interference-walkthrough.gif" alt="Read-only Polyweft browser studio displaying ancestor, left, right and configured merge for the crossing-surface case.">
 </picture>
 
-The original recording uses the published Blender 4.5.14 inspection, not a native browser write. [Original recording and source identities](docs/PRESENTATION.md).
+The recorded inspection used Blender 4.5.14. [Recording and source identities](docs/PRESENTATION.md) · [Resolve competing edits in the browser](https://nazeeh111.github.io/Polyweft/)
 
-## Revise the branch, then inspect again
-
-The new [native revision case](docs/presentation/README.md) follows the complete loop: **20 crossing face pairs → revise the right branch in Blender → replan and inspect → 0 represented-face crossings → apply and freshly reopen**. Both results retain the same prepared topology. Zero here concerns the stated represented-face model, not whole-scene collision or physical clearance.
-
-<picture>
-  <source media="(max-width: 650px)" srcset="docs/presentation/revision-mobile.png">
-  <img src="docs/presentation/revision.png" alt="Exact native combined surfaces share one orthographic camera and scale. Original edits have 20 crossing face pairs. Revising the right translation from minus 3 to minus 1 X yields zero within the complete represented-face inspection, then native output is freshly reopened.">
-</picture>
-
-[Portable native case and complete software source](docs/presentation/native-revision.zip) · [Exact recorded geometry](docs/presentation/revised-inspection.json) · [True phone capture](docs/presentation/revised-375.png).
+</details>
 
 ## Run the native workflow
 
@@ -71,7 +68,7 @@ Changing a choice or a monitored source-file property revokes the inspection and
 - Prepare before branching; retain durable identities and unchanged topology. Outside the admitted payload, **everything comes from right**. This is not a whole-scene merge or arbitrary mesh correspondence.
 - Surface inspection covers distinct native target polygon faces in object-local coordinates. Incomplete coverage never establishes separation. Other objects, solid containment, within-face folding, evaluated modifiers, artistic intent and physical tolerances remain outside scope.
 
-The new case ran on installed **Blender 5.1.2**, with 33 native/core Python tests and 13 Node tests passing. It does not replace the published Linux 4.5 LTS acceptance or establish held extension/workflow changes. Blender auto-execution is disabled; a trusted executable and trusted artwork are still required.
+The recorded revision ran on installed **Blender 5.1.2**, with 33 native/core Python tests and 13 Node tests passing. Extension verification is recorded separately above. Blender auto-execution is disabled; a trusted executable and trusted artwork are still required.
 
 [Full original guide](TECHNICAL_GUIDE.md) · [Merge contract](docs/CONTRACT.md) · [Inspection limits](docs/INTERFERENCE.md) · [Original verification](docs/VERIFICATION.md) · [Contributing](CONTRIBUTING.md).
 
