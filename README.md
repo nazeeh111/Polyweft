@@ -53,13 +53,7 @@ Omit decisions for a conflict-free plan. Inspect again after changing choices or
 
 The new native panel brings saved-file selection, whole-value choices, inspection and verified saving into Blender. It uses Blender's bundled Python, so the installed extension needs no pip, system Python or executable-path setup. Your active scene stays untouched. The browser becomes a read-only inspection snapshot; choices stay in the Blender panel.
 
-This is an **unreleased preview**. The installed operator workflow is verified on Blender 5.1.2 for macOS arm64; hands-on panel acceptance is still pending. The released command-line workflow is below. [Verification status](docs/VERIFICATION.md#native-extension-preview)
-
-From this source checkout, build the self-contained ZIP with Python 3.11+:
-
-```sh
-python tools/build_extension.py --output dist/polyweft-0.3.0.zip
-```
+[Download the extension ZIP](https://github.com/nazeeh111/Polyweft/releases/download/v0.3.0-preview.1/polyweft-0.3.0.zip) or [see the preview release and checksum](https://github.com/nazeeh111/Polyweft/releases/tag/v0.3.0-preview.1). The installed operator workflow passed on Blender 5.2.1 LTS for macOS arm64 and on Blender 4.5.14 LTS for Linux x64. Hands-on panel acceptance is pending. [Verification status](docs/VERIFICATION.md#native-extension-preview)
 
 Install it through **Preferences → Get Extensions → Install from Disk**, enable Polyweft, then open **3D View → Sidebar → Polyweft**.
 
